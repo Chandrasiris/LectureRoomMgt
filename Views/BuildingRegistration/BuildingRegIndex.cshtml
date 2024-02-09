@@ -1,0 +1,366 @@
+﻿@model LectureRoomMgt.Models.Reservation.BuildingRegVM;
+@inject IAuthorizationService authorization
+
+@{
+    ViewBag.Title = "Building";
+    ViewBag.View = "Building";
+
+    //var ModClaimCheck = (await authorization.AuthorizeAsync(User, "ModifyBuilding")).Succeeded ? true : false;
+    //var DelClaimCheck = (await authorization.AuthorizeAsync(User, "RemoveBuilding")).Succeeded ? true : false;
+    //var NewClaimCheck = (await authorization.AuthorizeAsync(User, "CreateBuilding")).Succeeded ? true : false;
+    @* var ModClaimCheck = true;
+    var DelClaimCheck = true;
+    var NewClaimCheck = true; *@
+
+
+}
+
+<style>
+    div.scroll {
+        overflow: auto;
+    }
+
+
+    .select2-selection__rendered {
+        line-height: 31px !important;
+    }
+
+    .select2-container .select2-selection--single {
+        height: 38px !important;
+    }
+
+    .select2-selection__arrow {
+        height: 34px !important;
+    }
+
+    span.select2-selection.select2-selection--single {
+        outline: none;
+    }
+
+    .select2-selection__choice {
+        margin-top: 2px !important;
+        padding-right: 5px !important;
+        padding-left: 5px !important;
+        background-color: transparent !important;
+        border: none !important;
+        border-radius: 4px !important;
+        background-color: blue !important;
+    }
+</style>
+
+
+<div class="modal fade" id="buildingModal" tabindex="-1" role="dialog" aria-labelledby="buildingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="buildingModalLabel">Suppliers</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="myModalBody">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Are you sure?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="myModalBody">
+                <p>Do you really want to delete the records?<br /> <b>This process cannot be undone</b>.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger btn-sm" id="btnDelete">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal2" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel2" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel2">Are you sure?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="myModalBody2">
+                <p>Do you really want to delete the records?<br /> <b>This process cannot be undone</b>.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger btn-sm" id="btnDeleteMain">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@Html.AntiForgeryToken()
+@*@if ((await authorization.AuthorizeAsync(User, "CreateBuilding")).Succeeded)
+    {*@
+<div class="row">
+    <div class="col-12">
+
+        <form id="saveForm">
+            <div class="card card-dark card-outline">
+                <div class="card-header">
+                    <h3 class="card-title">Faculty</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class=" col-12">
+                            <div class="form-row">
+                                <div class="form-group  col-4">
+                                    <label asp-for="Code" class="form-label"></label>
+                                    <input asp-for="Code" class="form-control" placeholder="Code" />
+                                    <span asp-validation-for="Code" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-8">
+                                    <label asp-for="FacultyName" class="form-label"></label>
+                                    <input asp-for="FacultyName" class="form-control" placeholder="Name of Faculty" />
+                                    <span asp-validation-for="FacultyName" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-12">
+                                    <label asp-for="Head" class="form-label"></label>
+                                    <input asp-for="Head" class="form-control" placeholder="Head of Faculty" />
+                                    <span asp-validation-for="Head" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card card-dark card-outline">
+                <div class="card-header">
+                    <h3 class="card-title">Facuty Contacts</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="col-5 mt-2">
+                            <div class="form-row">
+                                <div class="form-group col-12">
+                                    <label asp-for="Type" class="form-label"></label><br />
+                                    <select asp-for="Type" asp-items="@ViewBag.ComMethods as SelectList" class="form-control col-12">
+                                    </select>
+
+                                    <span asp-validation-for="Type" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group col-12">
+                                    <label asp-for="ContactPerson" class="form-label"></label>
+                                    <input asp-for="ContactPerson" class="form-control" placeholder="Name of Faculty" />
+                                    <span asp-validation-for="ContactPerson" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-12">
+                                    <label asp-for="ContactDes" class="form-label"></label>
+                                    <input asp-for="ContactDes" class="form-control" placeholder="Name of Faculty" />
+                                    <span asp-validation-for="ContactDes" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-1" style="text-align:center">
+                            <button id="btnTransfer" class="btn btn-default btn-lg" style="margin-top:120px" data-toggle="tooltip" data-placement="bottom" title="Save & Next Step!"><i class="fa fa-angle-right"></i></button>
+                        </div>
+
+                        <div class="col-6 mt-2">
+                            <div class="scroll">
+                                <table id="tempTable" class="table table-hover">
+                                    <thead>
+                                        <tr class="info">
+                                            <th>
+                                                @Html.DisplayName("Com Type")
+                                            </th>
+                                            <th>
+                                                @Html.DisplayName("Contact Person")
+                                            </th>
+                                            <th>
+
+                                                @Html.DisplayName("Contact Description")
+                                            </th>
+                                            <th>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card card-dark card-outline">
+                <div class="card-header">
+                    <h3 class="card-title">Faculty Blocks</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class=" col-12">
+                            <div class="form-row">
+                                <div class="form-group  col-4">
+                                    <label asp-for="BlockLetter" class="form-label"></label>
+                                    <input asp-for="BlockLetter" class="form-control" placeholder="Block Letter" />
+                                    <span asp-validation-for="BlockLetter" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-4">
+                                    <label asp-for="StartNumber" class="form-label"></label>
+                                    <input asp-for="StartNumber" class="form-control" placeholder="Start Number" />
+                                    <span asp-validation-for="StartNumber" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-4">
+                                    <label asp-for="NoOfBlocks" class="form-label"></label>
+                                    <input asp-for="NoOfBlocks" class="form-control" placeholder="No Of Blocks" />
+                                    <span asp-validation-for="NoOfBlocks" class="text-danger"></span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row mt-5">
+                <div class="card-footer col-12" style="text-align:center">
+                    <button id="btnSave" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Save !"><i class="fa fa-save"></i> Save</button>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+
+    <hr />
+</div>
+@*}*@
+<input type="hidden" id="hiddenItemId" />
+
+<script>
+      $(document).ready(function () {
+
+        var tmptable = $('#tempTable').DataTable({
+            "columns": [
+                { "data": "Type", "autowidth": true },
+                { "data": "ContactPerson", "autowidth": true },
+                { "data": "ContactDes", "autowidth": true },
+                {
+                    "data": "TempRowId", "orderable": "false", "render": function (data, type, row) {
+                        return '<button class="btn btn-danger btn-xs delBtn" href="#" data-toggle="tooltip" data-placement="bottom" title="Delete!"><span class="fas fa-trash-alt"> </button>'
+                    }, "orderable": false
+                }
+
+            ],
+            "scrollCollapse": true,
+            "autoWidth": true,
+            "bPaginate": false,
+            "bFilter": false,
+            "rowId": 'TempRowId',
+        });+
+
+        $("#tempTable").on('click', '.delBtn', function () {
+            tmptable.row($(this).parents('tr')).remove().draw(false);
+        });
+
+
+        $("#btnTransfer").click(function (e) {
+            e.preventDefault();
+
+            if ($('#ContactPerson').val() == '') {
+                    return;
+            }
+
+            var count = 0;
+            $('#tempTable tbody').find('tr').each(function () {
+                var row = $(this);
+                if ($('#Type :selected').text() == row.find('td').eq(0).text() &&
+                    $('#ContactPerson').val() == row.find('td').eq(1).text() &&
+                    $('#ContactDes').val() == row.find('td').eq(2).text()) {
+                    count++;
+                }
+            });
+
+            if (count > 0) {
+                return;
+            }
+
+            tmptable.row.add({
+                "Type": $('#Type :selected').val(),
+                "ContactPerson": $('#ContactPerson').val(),
+                "ContactDes": $('#ContactDes').val(),
+                "TempRowId": tmptable.data().count() + 1
+            }).draw(false);
+
+        });
+
+
+        $("#btnSave").click(function (e) {
+            e.preventDefault();
+
+            if (!$('#saveForm').valid()) {
+                return false;
+            }
+
+            var buildObj = new FormData;
+
+
+            if (tmptable.rows().count() != 0) {
+                var i = 0;
+                $('#tempTable tbody').find('tr').each(function () {
+                    var row = $(this);
+                    var data = $('#tempTable').DataTable().row(row).data();
+
+                    buildObj.append("FacultyContacts[" + i + "].Type", data['Type']);
+                    buildObj.append("FacultyContacts[" + i + "].ContactPerson", data['ContactPerson']);
+                    buildObj.append("FacultyContacts[" + i + "].ContactDes", data['ContactDes']);
+                    i++;
+                });
+            }
+
+            buildObj.append("Code", $('#Code').val());
+            buildObj.append("FacultyName", $('#FacultyName').val());
+            buildObj.append("Head", $('#Head').val());
+            buildObj.append("BlockLetter", $('#BlockLetter').val());
+            buildObj.append("StartNumber", $('#StartNumber').val());
+            buildObj.append("NoOfBlocks", $('#NoOfBlocks').val());
+
+            $.ajax({
+            cache: false,
+            type: "POST",
+            url: '@Url.Action("BuildingReg", "BuildingRegistration")',
+            data: buildObj,
+            contentType: false,
+            processData: false,
+            headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                if (response.status == "1") {
+                    window.location.replace(response.redirectUrl);
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (response) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+      });
+</script>

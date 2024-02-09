@@ -1,0 +1,35 @@
+﻿@model LectureRoomMgt.Models.Reservation.BlockVM
+
+
+
+<form id="DynamicBlockForm">
+
+
+    @foreach (var mainItem in (IEnumerable<LectureRoomMgt.Models.Reservation.Block>)ViewBag.BlockList)
+    {
+        <div class="btn-group dropright mb-3 col-4"
+             style="box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px; border-radius:5px">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-building mr-2" style="color:orange"></i> @mainItem.BlockName <span class="mr-2"></span>
+            </button>
+            <div class="dropdown-menu">
+
+                @if (mainItem.Floors.Count > 0)
+                {
+                    @foreach (var item in mainItem.Floors)
+                    {
+                        <a class="dropdown-item" href="@Url.Action("IndexBookRooms","Reservation",new {facId = mainItem.FacultyId, blockId = item.BlockId, floorId=item.Id })" target="_blank">@item.FloorName</a>
+                    }
+                }
+                else
+                {
+                    <p class="dropdown-item">No Floors</p>
+                }
+
+            </div>
+        </div>
+        <br />
+    }
+</form>
+

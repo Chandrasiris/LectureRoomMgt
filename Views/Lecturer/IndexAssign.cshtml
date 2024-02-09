@@ -1,0 +1,49 @@
+﻿@model LectureRoomMgt.Models.Lecturers.Lecturer;
+@inject IAuthorizationService authorization
+
+@{
+    ViewBag.Title = "Lecturers";
+}
+
+
+@if ((await authorization.AuthorizeAsync(User, "ViewAssignLecturer")).Succeeded)
+{
+    <div class="col-12">
+        <div class="card card-default">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-users mr-2"></i>
+                    Teachers
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    @foreach (var item in (IEnumerable<LectureRoomMgt.Models.Lecturers.Lecturer>)ViewBag.Lecturers)
+                    {
+                        <div class="col-5">
+                            <div class="callout callout-warning">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <h5>@item.LecturerId</h5>
+
+                                        <p>@item.FName</p>
+                                    </div>
+                                    <div class="col-4 mt-3">
+                                        <a asp-controller="Lecturer" asp-action="AssignLecturer" asp-route-encryptTeacherId="@item.EncryptLecturerId" class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="bottom" title="Manage !"><i class="fas fa-chevron-circle-right mr-1"></i> Manage</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-1">
+                        </div>
+
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+
+
+

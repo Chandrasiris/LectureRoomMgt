@@ -1,0 +1,466 @@
+﻿@model LectureRoomMgt.Models.Reservation.RoomReservationVM
+@using Kendo.Mvc.UI
+@using LectureRoomMgt.Models.Reservation
+
+
+<link href="~/custom/css/kendo.bootstrap-main.css" rel="stylesheet" />
+<script src="~/custom/js/jszip.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_jquery.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.all.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.aspnetmvc.min.js"></script>
+
+<script src="@Url.Content("~/scheduler/pako.min.js")"></script>
+
+<style>
+    .k-scheduler {
+        font-family: "DejaVu Sans", "Arial", sans-serif;
+    }
+
+    .k-pdf-export .k-scheduler-toolbar,
+    .k-pdf-export .k-scheduler-navigation .k-nav-today,
+    .k-pdf-export .k-scheduler-navigation .k-nav-prev,
+    .k-pdf-export .k-scheduler-navigation .k-nav-next,
+    .k-pdf-export .k-scheduler-footer {
+        display: none;
+    }
+
+    .movie-template img {
+        float: left;
+        margin: 0 8px;
+    }
+
+    .movie-template p {
+        margin: 5px 0 0;
+    }
+
+    .movie-template h3 {
+        padding: 0 8px 5px;
+        font-size: 12px;
+    }
+
+    .movie-template a {
+        color: #ffffff;
+        font-weight: bold;
+        text-decoration: none;
+    }
+
+        .k-state-hover .movie-template a,
+        .movie-template a:hover {
+            color: #000000;
+        }
+
+    body, h1, h2, h3 {
+        margin: 0px;
+    }
+</style>
+
+
+<div class="row">
+    <div class="col-12">
+        <div class="form-row mb-2">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-globe"></i>
+                    Rooms Booking
+                </h3>
+            </div>
+
+
+            <div class="card-footer col-12">
+                <div class="form-row">
+
+                    <div class="form-group col-6 offset-3">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <input type="checkbox" id="myCheck" onclick="myFunction()">
+                                </span>
+                            </div>
+                            <input type="text" disabled value="View All Reservations" class="form-control">
+                        </div>
+                    </div>
+
+
+                    <div class="form-group col-6 offset-3">
+
+                            <label class="form-label" style="text-align:left">Lecturer</label><br />
+                            @(Html.Kendo().DropDownList()
+                                .Name("LecturerId")
+                                .HtmlAttributes(new { style = "width:100%" })
+                                .OptionLabel("Select Lecturer")
+                                .DataTextField("LecturerName")
+                                .DataValueField("Id")
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetLecturers", "Reservation");
+                                    });
+                                })
+                            )
+                        </div>
+
+                    <div class="form-group col-6 offset-3">
+                        <label class="form-label">Course</label><br />
+                        @(Html.Kendo().DropDownList()
+                            .Name("CourseId")
+                            .HtmlAttributes(new { style = "width:100%" })
+                            .OptionLabel("Select Course")
+                            .DataTextField("CourseName")
+                            .DataValueField("Id")
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetCoursesbyLec", "Reservation").Data("filterCourses");
+                                })
+                                .ServerFiltering(true);
+                            })
+                            .Enable(false)
+                            .AutoBind(false)
+                            .CascadeFrom("LecturerId")
+                        )
+                    </div>
+
+                    <div class="form-group col-6 offset-3">
+                            <label class="form-label">Faculty</label><br />
+                            @(Html.Kendo().DropDownList()
+                                .Name("FacultyId")
+                                .HtmlAttributes(new { style = "width:100%" })
+                                .OptionLabel("Select Faculty")
+                                .DataTextField("FacultyName")
+                                .DataValueField("Id")
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetFaculties", "Reservation");
+                                    });
+                                })
+                            )
+                        </div>
+
+                        <div class="form-group col-6 offset-3">
+                            <label class="form-label">Block</label><br />
+                            @(Html.Kendo().DropDownList()
+                                .Name("BlockId")
+                                .HtmlAttributes(new { style = "width:100%" })
+                                .OptionLabel("Select Block")
+                                .DataTextField("BlockName")
+                                .DataValueField("Id")
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetBlocks", "Reservation").Data("filterBlocks");
+                                    })
+                                    .ServerFiltering(true);
+                                })
+                                .Enable(false)
+                                .AutoBind(false)
+                                .CascadeFrom("FacultyId")
+                            )
+                        </div>
+
+                        <div class="form-group col-6 offset-3">
+                            <label class="form-label">Floor</label><br />
+                            @(Html.Kendo().DropDownList()
+                                .Name("FloorId")
+                                .HtmlAttributes(new { style = "width:100%" })
+                                .OptionLabel("Select Floor")
+                                .DataTextField("FloorName")
+                                .DataValueField("Id")
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetFloors", "Reservation").Data("filterFloors");
+                                    })
+                                    .ServerFiltering(true);
+                                })
+                                .Enable(false)
+                                .AutoBind(false)
+                                .CascadeFrom("BlockId")
+                            )
+                        </div>
+
+                        <div class="form-group col-6 offset-3">
+                            <label class="form-label">Room</label><br />
+                            @(Html.Kendo().DropDownList()
+                                .Name("RoomId")
+                                .HtmlAttributes(new { style = "width:100%" })
+                                .OptionLabel("Select Room")
+                                .DataTextField("RoomName")
+                                .DataValueField("Id")
+                                .Events(e => e.Change("change"))
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetRooms", "Reservation").Data("filterRooms");
+                                    })
+                                    .ServerFiltering(true);
+                                })
+                                .Enable(false)
+                                .AutoBind(false)
+                                .CascadeFrom("FloorId")
+                            )
+                        </div>
+                    <input type="hidden" value="@ViewBag.RoomId" id="RoomId" name="RoomId" />
+                </div>
+            </div>
+
+            <div class="card-footer col-12" style="text-align:center">
+                <button id="btnView" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="bottom" title="View Bookings !"><i class="fa fa-info mr-2"></i> View Bookings</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" id="schedulerPane" style="display:none">
+    <div class="col-12">
+        <div class="form-row mb-2">
+            <div class="card-footer col-12" style="text-align:center">
+                <div class="form-row">
+                    @(Html.Kendo().Scheduler<LectureRoomMgt.Models.Reservation.RoomReservationVM>()
+                        .Name("scheduler")
+                        .Date(DateTime.Now)
+                        .StartTime(new DateTime(2023, 5, 1, 6, 00, 00))
+                        .Height(600)
+                        .HtmlAttributes(new { style = "width:100%" })
+                        .Pdf(pdf => pdf
+                            .FileName("Booking.pdf")
+                            .ProxyURL(Url.Action("Pdf_Export_Save", "Grid"))
+                        )
+                        .Toolbar(t =>
+                        { t.Pdf(); t.Search(); }
+                        )
+                        .EventTemplate(
+                                    "<div class='movie-template'>" +
+                                        "<img src='" + Url.Content("~/scheduler/") + "#= Image #' />" + "<h3>#= RoomName #</h3>" +
+                                        "<p>" +
+                                            "#= kendo.toString(start, 'hh:mm') # - #= kendo.toString(end, 'hh:mm') #" +
+                                        "</p>" +
+                                        "<h3>#= title #</h3>" +
+                                    "</div>")
+                       .Views(views =>
+                       {
+                           views.DayView();
+                           views.WeekView();
+                           views.MonthView();
+                           views.AgendaView();
+                       })
+                        .Timezone("Etc/UTC")
+                        .DataSource(d => d
+                            .Events(e => e.Error("onError"))
+                            .Model(m =>
+                            {
+                                m.Id(f => f.ReservationId);
+                                m.Field(f => f.Title).DefaultValue("No title");
+                                m.Field(f => f.Start);
+                                m.Field(f => f.RoomId);
+                                m.RecurrenceId(f => f.RecurrenceID);
+                            })
+                        .Read("Overview_Read", "Reservation", new { roomId = ViewBag.roomId }))                        
+                        //.Create(create => create.Action("Schedules_Create", "Reservation").Data("additionalData"))
+                        //.Update(update => update.Action("Schedules_Update", "Reservation").Data("additionalData"))
+                        //.Destroy(destroy => destroy.Action("Schedules_Destroy", "Reservation").Data("additionalData"))
+                        )
+                    )
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<br />
+<script id="event-template" type="text/x-kendo-template">
+    <div class="movie-template">
+        <h3>#= title #</h3>
+        # if (Image) { #
+        <img src="@Url.Content("~/scheduler/" + "#= Image #")" />
+        # } #
+        <br><p>#= kendo.toString(start, 'hh:mm') # - #= kendo.toString(end, 'hh:mm') #</p>
+        <p>#= RoomName #</p>
+    </div>
+</script>
+
+<script>
+    function filterBlocks() {
+        return {
+            FacultyId: $("#FacultyId").val()
+        };
+    }
+    function filterFloors() {
+        return {
+            BlockId: $("#BlockId").val()
+        };
+    }
+    function filterRooms() {
+        return {
+            FloorId: $("#FloorId").val()
+        };
+    }
+    function filterCourses() {
+        return {
+            LecturerId: $("#LecturerId").val()
+        };
+    }
+</script>
+
+<script type="text/javascript">
+    function onError(e) {
+        this.cancelChanges();
+        var errorMessage = "Error has happened!";
+        if (e.errors) {
+            for (var error in e.errors) {
+                errorMessage += e.errors[error].errors[0] + " ";
+            }
+        }
+        alert(errorMessage);
+    }
+
+    function additionalData() {
+
+        var value1 = $("#RoomId").data("kendoDropDownList").value();
+        var value2 = $("#LecturerId").data("kendoDropDownList").value();
+        var value3 = $("#CourseId").data("kendoDropDownList").value();
+
+        return { roomId: value1, lecId: value2, courseId: value3 };
+    }
+
+    function change(e) {
+        var checkBox = document.getElementById("myCheck");
+        checkBox.checked = false;
+        var scheduler = $("#scheduler").data("kendoScheduler");
+        scheduler.dataSource.read();
+    }
+
+
+    function myFunction() {
+
+        $('#schedulerPane').show();
+
+        var checkBox = document.getElementById("myCheck");
+        var dropdown1 = $("#LecturerId").data("kendoDropDownList");
+        var dropdown2 = $("#CourseId").data("kendoDropDownList");
+        var dropdown3 = $("#FacultyId").data("kendoDropDownList");
+        var dropdown4 = $("#BlockId").data("kendoDropDownList");
+        var dropdown5 = $("#FloorId").data("kendoDropDownList");
+        var dropdown6 = $("#RoomId").data("kendoDropDownList");
+
+        if (checkBox.checked == true) {
+            var scheduler = $("#scheduler").data("kendoScheduler");
+            scheduler.dataSource.read();
+            dropdown1.enable(false);
+            dropdown2.enable(false);
+            dropdown3.enable(false);
+            dropdown4.enable(false);
+            dropdown5.enable(false);
+            dropdown6.enable(false);
+            $('#btnView').prop('disabled', true)
+        }
+        else {
+            $('#schedulerPane').hide();
+            dropdown1.enable(true);
+            dropdown2.enable(true);
+            dropdown3.enable(true);
+            dropdown4.enable(true);
+            dropdown5.enable(true);
+            dropdown6.enable(true);
+            $('#btnView').prop('disabled', false)
+        }
+    }
+
+</script>
+
+
+<script>
+    $(document).ready(function () {
+
+        $('#LecturerId').change(function () {
+            event.preventDefault();
+            $('#schedulerPane').hide();
+            var dropdown = $("#RoomId").data("kendoDropDownList");
+            var value = dropdown.value();
+            if (value != "") {
+                $('#schedulerPane').show();
+            }
+        });
+
+        $('#CourseId').change(function () {
+            event.preventDefault();
+            $('#schedulerPane').hide();
+            var dropdown = $("#RoomId").data("kendoDropDownList");
+            var value = dropdown.value();
+            if (value != "") {
+                $('#schedulerPane').show();
+            }
+        });
+
+        $('#FacultyId').change(function () {
+            event.preventDefault();
+            $('#schedulerPane').hide();
+            var dropdown = $("#RoomId").data("kendoDropDownList");
+            var value = dropdown.value();
+            if (value != "") {
+                $('#schedulerPane').show();
+            }
+        });
+
+        $('#BlockId').change(function () {
+            event.preventDefault();
+            $('#schedulerPane').hide();
+            var dropdown = $("#RoomId").data("kendoDropDownList");
+            var value = dropdown.value();
+            if (value != "") {
+                $('#schedulerPane').show();
+            }
+        });
+
+        $('#FloorId').change(function () {
+            event.preventDefault();
+            $('#schedulerPane').hide();
+            var dropdown = $("#RoomId").data("kendoDropDownList");
+            var value = dropdown.value();
+            if (value != "") {
+                $('#schedulerPane').show();
+            }
+        });
+        $('#room').change(function () {
+            event.preventDefault();
+            $('#schedulerPane').hide();
+            var dropdown = $("#RoomId").data("kendoDropDownList");
+            var value = dropdown.value();
+            if (value != "") {
+                $('#schedulerPane').show();
+            }
+        });
+
+        $("#btnView").click(function (e) {
+            e.preventDefault();
+            var dropdown1 = $("#LecturerId").data("kendoDropDownList");
+            var dropdown2 = $("#CourseId").data("kendoDropDownList");
+            var dropdown3 = $("#FacultyId").data("kendoDropDownList");
+            var dropdown4 = $("#BlockId").data("kendoDropDownList");
+            var dropdown5 = $("#FloorId").data("kendoDropDownList");
+            var dropdown6 = $("#RoomId").data("kendoDropDownList");
+
+            if (dropdown1.value() == "" ||
+                dropdown2.value() == "" ||
+                dropdown3.value() == "" ||
+                dropdown4.value() == "" ||
+                dropdown5.value() == "" ||
+                dropdown6.value() == "") {
+                return false;
+            }
+
+            $('#schedulerPane').show();
+            var scheduler = $("#scheduler").data("kendoScheduler");
+            scheduler.dataSource.read();
+        });
+    });
+</script>
+

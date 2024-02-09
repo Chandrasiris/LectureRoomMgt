@@ -1,0 +1,7 @@
+﻿@model LectureRoomMgt.Models.Reservation.FacilityCategoryVM
+@using Kendo.Mvc.UI
+@(Html.Kendo().DropDownListFor(m => m)
+    .DataValueField("Id")
+    .DataTextField("Category")
+    .BindTo((System.Collections.IEnumerable)ViewData["facilityCategories"])
+)

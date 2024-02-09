@@ -1,0 +1,174 @@
+﻿
+@{
+    ViewBag.Title = "Facility-Categories";
+
+    var ModClaimCheck = true;
+    var DelClaimCheck = true;
+    var NewClaimCheck = true;
+}
+
+@using Kendo.Mvc.UI
+@using Kendo.Mvc
+
+
+<link href="~/custom/css/kendo.bootstrap-main.css" rel="stylesheet" />
+<script src="~/custom/js/jszip.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_jquery.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.all.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.aspnetmvc.min.js"></script>
+
+
+<style>
+    .k-grid tbody tr {
+        line-height: 14px;
+    }
+
+    .k-grid tbody td {
+        padding: 5px;
+    }
+
+    .k-grid-save-changes:hover {
+        background-color: #5cb85c;
+    }
+
+    .k-grid-delete-custom {
+        background-color: tomato;
+    }
+
+    .k-grid-cancel-changes:hover {
+        background-color: red;
+    }
+
+    .k-grid-excel:hover {
+        background-color: forestgreen;
+    }
+
+    .k-grid-pdf:hover {
+        background-color: red;
+    }
+
+    .k-grid .k-grid-toolbar .k-grid-add,
+    .k-grid .k-grid-toolbar .k-grid-save-changes,
+    .k-grid .k-grid-toolbar .k-grid-cancel-changes,
+    .k-grid .k-grid-toolbar .k-grid-delete-custom {
+        min-width: 0;
+    }
+
+        .k-grid .k-grid-toolbar .k-grid-add .k-icon,
+        .k-grid .k-grid-toolbar .k-grid-save-changes .k-icon,
+        .k-grid .k-grid-toolbar .k-grid-cancel-changes .k-icon,
+        .k-grid .k-grid-toolbar .k-grid-delete-custom .k-icon {
+            margin: 0;
+        }
+</style>
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card card-primary card-outline">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-landmark"></i>
+                    Facility-Categories
+                </h3>
+            </div>
+
+            <div class="card-body">
+                @(Html.Kendo().Grid<LectureRoomMgt.Models.Reservation.FacilityCategoryVM>()
+                .Name("FacCatGrid")
+                .Columns(columns =>
+                {
+                    columns.Select().Width(40).HeaderHtmlAttributes(new { @style = "text-align:center" }).HtmlAttributes(new { @style = "text-align:center" });
+                    columns.Bound(p => p.Category).Title("Category");
+                    columns.Bound(p => p.Comment);
+                    columns.Bound(p => p.Id).Hidden();
+
+                })
+                        .ToolBar(toolbar =>
+                        {
+                            if (NewClaimCheck)
+                            {
+                                toolbar.Create().Text(" ").HtmlAttributes(new { @class = "bg-info" });
+                            }
+                            toolbar.Save().Text(" ").CancelText(" ");
+                            {
+                                if (DelClaimCheck)
+                                {
+                                    toolbar.Custom().Text(" ").IconClass("k-icon k-i-trash").HtmlAttributes(new { @class = "k-grid-delete-custom" });
+                                }
+                            }
+
+                            toolbar.Excel().Text("Excel").HtmlAttributes(new { @class = "ml-5" });
+                            toolbar.Pdf().Text("Pdf");
+                            toolbar.Search();
+                        })
+                .Selectable(selectable => selectable.Mode(GridSelectionMode.Multiple))
+                .Editable(editable =>
+                {
+                    if (ModClaimCheck)
+                    {
+                        editable.Mode(GridEditMode.InCell).DisplayDeleteConfirmation(false);
+                    }
+                })
+                .Pageable()
+                .ColumnMenu(col => col.Filterable(false))
+                .Navigatable()
+                .Sortable()
+                .Scrollable()
+                .Resizable(resize => resize.Columns(true))
+                .Reorderable(r => r.Columns(true))
+                .Filterable()
+                .DataSource(dataSource => dataSource
+                      .Ajax()
+                      .Batch(true)
+                      .PageSize(15)
+                      .ServerOperation(false)
+                      .Events(events => events.Error("fac_cat_err"))
+                      .Model(model =>
+                      {
+                          model.Id(roomType => roomType.Id);
+                      })
+                      //.Aggregates(aggregates =>
+                      //   {
+                      //       aggregates.Add(p => p.FacultyName).Count();
+                      //})
+                      .Create(create => create.Action("CreateFacCats", "FacilityCategory"))
+                      .Read(read => read.Action("LoadFacCats", "FacilityCategory"))
+                      .Update(update => update.Action("EditFacCats", "FacilityCategory"))
+                      .Destroy(destroy => destroy.Action("DeleteFacCats", "FacilityCategory"))
+                   )
+                )
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+
+    $("#FacCatGrid").on("click", ".k-grid-delete-custom", function (e) {
+        e.preventDefault();
+
+        var grid = $("#FacCatGrid").data("kendoGrid");
+        grid.select().each(function () {
+            grid.removeRow($(this));
+        });
+    });
+
+
+    function fac_cat_err(e) {
+        if (e.errors) {
+            var message = "";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "</br>";
+                    });
+                }
+            });
+            toastr.error(message);
+        }
+    }
+</script>

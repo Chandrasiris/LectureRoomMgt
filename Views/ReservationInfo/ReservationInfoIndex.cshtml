@@ -1,0 +1,134 @@
+﻿@using Kendo.Mvc.UI
+@using Kendo.Mvc
+@{
+    ViewData["Title"] = "Index";
+}
+
+<link href="~/custom/css/kendo.bootstrap-main.css" rel="stylesheet" />
+<script src="~/custom/js/jszip.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_jquery.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.all.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.aspnetmvc.min.js"></script>
+
+
+<style>
+    .k-grid tbody tr {
+        line-height: 14px;
+    }
+
+    .k-grid tbody td {
+        padding: 5px;
+    }
+
+    .k-grid-save-changes:hover {
+        background-color: #5cb85c;
+    }
+
+    .k-grid-delete-custom {
+        background-color: tomato;
+    }
+
+    .k-grid-cancel-changes:hover {
+        background-color: red;
+    }
+
+    .k-grid-excel:hover {
+        background-color: forestgreen;
+    }
+
+    .k-grid-pdf:hover {
+        background-color: red;
+    }
+
+    .k-grid .k-grid-toolbar .k-grid-add,
+    .k-grid .k-grid-toolbar .k-grid-save-changes,
+    .k-grid .k-grid-toolbar .k-grid-cancel-changes,
+    .k-grid .k-grid-toolbar .k-grid-delete-custom {
+        min-width: 0;
+    }
+
+        .k-grid .k-grid-toolbar .k-grid-add .k-icon,
+        .k-grid .k-grid-toolbar .k-grid-save-changes .k-icon,
+        .k-grid .k-grid-toolbar .k-grid-cancel-changes .k-icon,
+        .k-grid .k-grid-toolbar .k-grid-delete-custom .k-icon {
+            margin: 0;
+        }
+</style>
+
+
+@(Html.Kendo().Grid<LectureRoomMgt.Models.Reservation.ReservationInfoVM>
+    ()
+    .Name("grid")
+    .Columns(columns =>
+        {
+            columns.Bound(p => p.FacultyName).Title("Faculty").Width(150).ClientGroupHeaderTemplate("#= value # ( #=count# )");
+            columns.Bound(p => p.BlockName).Title("Block").Width(100).ClientGroupHeaderTemplate("#= value # ( #=count# )");
+            columns.Bound(p => p.FloorName).Title("Floor").Width(100).ClientGroupHeaderTemplate("#= value # ( #=count# )");//.Filterable(false)
+            columns.Bound(p => p.RoomName).Title("Room").Width(100);
+            columns.Bound(p => p.RoomStatus).Title("Status").Width(100);
+            columns.Bound(p => p.Title).Width(100).ClientTemplate("<span class=#:Title.indexOf('No reservation')>0?'redColor':'greenColor'#>#:Title#</span>");
+            columns.Bound(p => p.Date).Format("{0:MM/dd/yyyy}").Width(100);
+            columns.Bound(p => p.Start).Title("Start").Format("{0:hh:mm:ss}").Width(100);
+            columns.Bound(p => p.End).Title("End").Format("{0:hh:mm:ss}").Width(100);
+            columns.Bound(p => p.ResStatus).Title("Reservation Status").Width(150);
+            columns.Bound(p => p.CourseName).Title("Course").Width(120);
+            columns.Bound(p => p.LecName).Title("Lecturer").Width(120);
+
+    })
+    .ToolBar(toolbar =>
+    {
+        toolbar.Excel().Text("Excel").HtmlAttributes(new { @class = "ml-5" });
+        toolbar.Pdf().Text("Pdf");
+    })
+    .Pageable()
+    .Groupable()
+    .Sortable()
+    .HtmlAttributes(new { style = "height:1400px;" })
+    .Resizable(resize => resize.Columns(true))
+    .Reorderable(r => r.Columns(true))
+    .Scrollable()
+    .Filterable()
+    .DataSource(dataSource => dataSource
+                .Ajax()
+                .PageSize(2000)
+                .Model(model =>
+                {
+                    model.Id(p => p.ReservationId);
+                })
+                .Aggregates(aggregates =>
+                {
+                    aggregates.Add(p => p.FacultyName).Count();
+                    aggregates.Add(p => p.FloorName).Count();
+                    aggregates.Add(p => p.BlockName).Count();
+
+
+                })
+    .Group(group => group.Add("FacultyName", typeof(string), ListSortDirection.Descending))
+    .Group(group => group.Add("BlockName", typeof(string), ListSortDirection.Descending))
+
+    .Read(read => read.Action("Read", "ReservationInfo"))
+    )
+)
+
+<script>
+    //function onDataBound(e) {
+    //    var grid = this;
+    //    grid.table.find("tr").each(function () {
+    //        var dataItem = grid.dataItem(this);
+    //        var themeColor = dataItem.Title == "No reservation" ? 'success' : 'error';
+    //        var text = dataItem.Title == "No reservation" ? 'not available' : 'available';
+
+    //        $(this).find('script').each(function () {
+    //            eval($(this).html());
+    //        });
+
+    //        $(this).find(".badgeTemplate").kendoBadge({
+    //            themeColor: themeColor,
+    //           text: text,
+    //        });
+
+
+    //        kendo.bind($(this), dataItem);
+    //    });
+    //}
+</script>

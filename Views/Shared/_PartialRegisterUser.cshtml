@@ -1,0 +1,58 @@
+﻿@model LectureRoomMgt.Models.ViewModels.UserViewModel
+
+<form id="registerUser">
+    @Html.AntiForgeryToken()
+
+    <div class="row">
+        <div class="col-md-12">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <span asp-validation-for="AccessCode" class="text-danger"></span>
+            <div class="input-group mb-3">
+                <input asp-for="AccessCode" class="form-control" placeholder="Access code" />
+                <div class="input-group-append">
+                    <div class="input-group-text">
+                        <span class="fas fa-id-badge"></span>
+                    </div>
+                </div>
+            </div>
+
+
+            <span asp-validation-for="MUsername" class="text-danger"></span>
+            <div class="input-group mb-3">
+                <input asp-for="MUsername" class="form-control" placeholder="Username" />
+                <div class="input-group-append">
+                    <div class="input-group-text">
+                        <span class="fas fa-user"></span>
+                    </div>
+                </div>
+            </div>
+
+            <span asp-validation-for="MPassword" class="text-danger"></span>
+            <div class="input-group mb-3">
+                <input asp-for="MPassword" type="password" class="form-control" placeholder="Password" />
+                <div class="input-group-append">
+                    <div class="input-group-text">
+                        <span class="fas fa-lock"></span>
+                    </div>
+                </div>
+
+            </div>
+
+            <span asp-validation-for="MConfirmPassword" class="text-danger"></span>
+            <div class="input-group mb-3">
+                <input asp-for="MConfirmPassword" type="password" class="form-control" placeholder="Confirm Password" />
+                <div class="input-group-append">
+                    <div class="input-group-text">
+                        <span class="fas fa-lock"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+
+
+

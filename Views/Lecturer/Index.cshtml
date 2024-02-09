@@ -1,0 +1,277 @@
+﻿@model LectureRoomMgt.Models.Lecturers.Lecturer;
+@inject IAuthorizationService authorization
+@{
+    ViewBag.Title = "Lecturers";
+    ViewBag.View = "Lecturers";
+
+    var ModClaimCheck = (await authorization.AuthorizeAsync(User, "ModifyLecturer")).Succeeded ? "true" : "false";
+    var DelClaimCheck = (await authorization.AuthorizeAsync(User, "RemoveLecturer")).Succeeded ? "true" : "false";
+}
+
+
+<style>
+    div.scroll {
+        overflow: auto;
+    }
+</style>
+
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Lecturer</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="myModalBody">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success btn-sm" id="btnEdit">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Are you sure?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="myModalBody">
+                <p>Do you really want to delete this record?<br /> <b>This process cannot be undone</b>.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger btn-sm" id="btnDelete">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="errorModalLabel">404 Error Page</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="myModalBody">
+                <div class="error-page">
+                    <h2 class="headline text-warning">404</h2>
+
+                    <div class="error-content">
+                        <h3><i class="fas fa-exclamation-triangle text-warning"></i> Oops! Page not found..</h3>
+                        <p>
+                            Meanwhile, you may <a href='@Url.Action("Index", "Home")'>return to HOME</a> or contact the system administrator.
+                        </p>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="scroll">
+    <table id="infoTable" class="table table-hover table-striped">
+        <thead>
+            <tr class="info" style="background-color:gainsboro">
+                <th colspan="4" style="text-align:center;border-right-style:groove">
+                    @Html.DisplayName("Information")
+                </th>
+                <th colspan="2" style="text-align:center">
+                    @Html.DisplayName("Action")
+                </th>
+
+            </tr>
+
+            <tr class="info">
+                <th>
+                    @Html.DisplayNameFor(model => model.FName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Dob)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Mobile)
+                </th>
+                <th>
+                </th>
+                <th>
+                </th>
+
+            </tr>
+        </thead>
+    </table>
+
+</div>
+<input type="hidden" id="hiddenId" />
+
+<script src="~/Theme/plugins/moment/moment.min.js"></script>
+<script>
+    $(document).ready(function () {
+
+        var table = $('#infoTable').DataTable({
+            "ajax": '@Url.Action("LecturerLoad", "Lecturer")',
+            "columnDefs": [
+                    { "targets": [3], "visible": @ModClaimCheck, "width": "10px" },
+                    { "targets": [4], "visible": @DelClaimCheck, "width": "10px" }
+            ],
+            "columns": [
+                   { "data": "FName", "autowidth": true },
+                   { "data": "Dob", "render": function (data, type, row) {
+                        if (data != null) {
+                                     return moment(data).format("YYYY-MM-DD");
+                        }
+                        else {return ''}
+                      }
+                   },
+                   { "data": "Mobile", "autowidth": true },
+                   { "data": "EncryptLecturerId", "render": function (data, type, row) {
+
+                           return '<a id="' + data + '" class="btn btn-warning btn-xs tblBtnEdit" href="#" data-toggle="tooltip" data-placement="bottom" title="Edit!"> <span class="fas fa-edit"></span> </a>';
+                                 },"orderable": false
+                   },
+                   { "data": "EncryptLecturerId", "render": function (data, type, row) {
+
+                           return '<a id="' + data + '" class="btn btn-danger btn-xs tblBtnDelete" href="#" data-toggle="tooltip" data-placement="bottom" title="Delete!"> <span class="fas fa-trash-alt"></span> </a>';
+                                 },"orderable": false
+                   }
+                ],
+            "scrollCollapse": true,
+            "autoWidth": true,
+            "processing": true,
+            "rowId": 'EncryptLecturerId'
+        });
+
+
+        $('#infoTable').on('click', '.tblBtnEdit', function () {
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("EditLecturer", "Lecturer")',
+                contentType: "application/json; charset=utf-8",
+                data: { id: $(this).attr('id') },
+                datatype: "json",
+            }).done(function (response) {
+                if (response.status != "4") {
+                    $('#myModalBody').html(response);
+                    $('#editModal').modal('show');
+                }
+                else {
+                   $('#errorModal').modal('show');
+                }
+            });
+        });
+
+        $('#infoTable').on('click', '.tblBtnDelete', function () {
+            $("#hiddenId").val($(this).attr('id'));
+            $('#deleteModal').modal('show');
+        });
+
+
+        $("#btnEdit").click(function (e) {
+            e.preventDefault();
+
+            $.validator.unobtrusive.parse($('#editForm'));
+
+            if (!$('#editForm').valid()) {
+                return false;
+            }
+
+            var file = $("#LecturerImageFile").get(0).files;
+            var teacherObj = new FormData;
+
+            teacherObj.append("EncryptLecturerId", $('#EncryptLecturerId').val());
+            teacherObj.append("FName", $('#FName').val());
+            teacherObj.append("SName", $('#SName').val());
+            teacherObj.append("JoinedDate", $('#JoinedDate').val());
+            teacherObj.append("Email", $('#Email').val());
+            teacherObj.append("Dob", $('#Dob').val());
+            teacherObj.append("Mobile", $('#Mobile').val());
+            teacherObj.append("HomeTel", $('#HomeTel').val());
+            teacherObj.append("OfficeTel", $('#OfficeTel').val());
+            teacherObj.append("Gender", $('#Gender :selected').val());
+            teacherObj.append("Designation", $('#Designation :selected').val());
+            teacherObj.append("Title", $('#Title :selected').val());
+            teacherObj.append("Comment", $('#Comment').val());
+            teacherObj.append("Qualifications", $('#Qualifications').val());
+
+            teacherObj.append("IsImageDeleted", $("#hiddenImageDelete").val());
+            teacherObj.append("IsImageChange", $("#imageChange").val());
+            teacherObj.append("LecturerImageFile", file[0]);
+
+            $('#editModal').modal('hide');
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: '@Url.Action("EditLecturer", "Lecturer")',
+                data: teacherObj,
+                contentType: false,
+                processData: false,
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                if (response.status == "1") {
+
+                    table.row('#' + response.lecturerObj['EncryptLecturerId']).remove().draw(false);
+                    table.row.add({
+                        "FName": response.lecturerObj['FName'],
+                        "Dob": response.lecturerObj['Dob'],
+                        "Mobile": response.lecturerObj['Mobile'],
+                        "EncryptLecturerId": response.lecturerObj['EncryptLecturerId'],
+                        "EncryptLecturerId": response.lecturerObj['EncryptLecturerId']
+                    }).draw(false);
+
+                    toastr.success('Saved successfully !');
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (response) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+
+
+        $("#btnDelete").click(function (e) {
+            e.preventDefault();
+
+            var id = $("#hiddenId").val();
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: '@Url.Action("DeleteLecturer", "Lecturer")',
+                dataType: "json",
+                data: JSON.stringify(id),
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                 $('#deleteModal').modal('hide');
+                if (response.status == "1") {
+                    table.row('#' + id).remove().draw(false);
+                    $("#countSpan").text(parseInt($("#countSpan").text()) - 1);
+                    toastr.success('Deleted successfully !');
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (jqXHR, textStatus) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+    });
+
+</script>

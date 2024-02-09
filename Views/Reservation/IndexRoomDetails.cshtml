@@ -1,0 +1,422 @@
+﻿@using Kendo.Mvc.UI
+<link href="~/custom/css/kendo.bootstrap-v4.min.css" rel="stylesheet" />
+<link href="~/custom/css/kendo.bootstrap-main.css" rel="stylesheet" />
+<script src="~/custom/js/kendo.all.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_jquery.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.all.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.aspnetmvc.min.js"></script>
+<script src="~/custom/js/kendo.aspnetmvc.min.js"></script>
+
+<div class="dash-head">
+    <!-- toggle button for responsive panel, hidden on large screens -->
+    @*<button class="k-rpanel-toggle"><span class="k-icon k-i-menu"></span></button>*@
+</div>
+<div class="panel-wrap">
+    @*@(Html.Kendo().ResponsivePanel()
+            .Name("sidebar")
+            .Breakpoint(1000)
+            .Orientation(ResponsivePanelOrientation.Left)
+            .Content("<div> <div id='profile' class='widget'> <h3>Profile</h3> <div> <div class='profile-photo'>" +
+            " </div> <h4>Lynda Schleifer</h4> <p>Sales Associate</p> </div> </div> <div id='teammates' class='widget'> <h3>Teammates</h3>" +
+            " <div> <div class='team-mate'> <img src='~/RoomGallery/01.jpg' alt='Andrew Fuller'> <h4>Andrew Fuller</h4> <p>Team Lead</p> </div> " +
+            " <div class='team-mate'> <img src='/RoomGallery/02.jpg' alt='Nancy Leverling'> <h4>Nancy Leverling</h4> <p>Sales Associate</p></div>" +
+            " <div class='team-mate'> <img src='/RoomGallery/01.jpg' alt='Robert King'> <h4>Robert King</h4> <p>Business System Analyst</p> </div> </div> </div>")
+        )*@
+
+    <h4>Image gallery (@ViewBag.roomId)</h4>
+    <div class="k-card-deck-scrollwrap">
+        <button class="k-button k-button-solid-base k-button-solid k-button-md k-rounded-md k-flat k-button-icon k-button-scroll">
+            <span class="k-icon k-i-arrow-chevron-left"></span>
+        </button>
+        <div class="k-card-deck">
+            @foreach (var image in (IEnumerable<LectureRoomMgt.Models.Reservation.RoomImage>)ViewBag.RoomGallery)
+            {
+                var img = "/RoomGallery/" + ViewBag.roomId + "/" + image.Ext;
+                <div class="k-card k-card-type-rich">
+                    <img src="@img" alt="undefined" class="k-card-image">
+                </div>
+            }
+        </div>
+        <button class="k-button k-button-solid-base k-button-solid k-button-md k-rounded-md k-flat k-button-icon k-button-scroll">
+            <span class="k-icon k-i-arrow-chevron-right"></span>
+        </button>
+    </div>
+
+    <br />
+    <div id="main-content">
+        <div id="news" class="widget">
+            <h4>Current schedule</h4>
+            <div>
+
+
+                <script id="event-template" type="text/x-kendo-template">
+                    <div class="template-container">
+                        # if (Image) { #
+                        <img src="@Url.Content("/Scheduler/scheduler/" + "#= Image #")" style="height:25px; width: 25px;" />
+                        # } #
+                        <h3 class="template-title-#= resources[0].value #">#: title #</h3>
+                    </div>
+                </script>
+                @{ var d = System.DateTime.Now;}
+                @(Html.Kendo().Scheduler<LectureRoomMgt.Models.Scheduler.Meeting>()
+                    .Name("scheduler")
+                    .Date(new DateTime(d.Year, d.Month, d.Day))
+                    .StartTime(new DateTime(d.Year, d.Month, d.Day, 7, 00, 00))
+                    .EndTime(new DateTime(d.Year, d.Month, d.Day, 20, 00, 00))
+                    .Height(600)
+                    .EventTemplateId("event-template")
+                    .Views(views =>
+                    {
+                        views.DayView();
+                        views.AgendaView(week =>
+                        {
+                            week.Selected(true);
+                        });
+                        views.WeekView(); views.WorkWeekView(); views.MonthView();
+                    })
+                    .Resources(resource =>
+                    {
+                        resource.Add(m => m.Attendee)
+                        .Title("Attendee")
+                        .DataTextField("Text")
+                        .DataValueField("Value")
+                        .DataColorField("Color")
+                        .BindTo(new[] {
+                            new { Text = "Jason", Value = 1, Color = "#eaf8ff" }
+                        });
+                    })
+                    .DataSource(d => d
+                        .Model(m =>
+                        {
+                            m.Id(f => f.MeetingID);
+                            m.Field(f => f.Title).DefaultValue("No title");
+                            m.Field(f => f.Attendee).DefaultValue(1);
+                        })
+                        .Read("Overview_Read", "Reservation",new { roomId = ViewBag.roomId })
+                    //.Create("Overview_Create", "Scheduler")
+                    //.Destroy("Overview_Destroy", "Scheduler")
+                    //.Update("Overview_Update", "Scheduler")
+                    )
+                )
+
+                <style>
+                    .template-container {
+                        margin-top: -8px;
+                    }
+
+                        .template-container img {
+                            float: left;
+                            margin: 0 4px;
+                            margin-right: 10px;
+                        }
+
+                        .template-container h3 {
+                            padding: 0 4px 4px;
+                            font-size: 12px;
+                            font-weight: 600;
+                            margin-right: 14px;
+                        }
+
+                    .template-title-1 {
+                        color: #65CCFF;
+                    }
+
+                    .template-title-2 {
+                        color: #D0D03B;
+                    }
+
+                    .k-event .k-i-reload,
+                    .k-event .k-i-non-recurrence {
+                        display: none;
+                    }
+                </style>
+
+            </div>
+        </div>
+        <div id="blogs" class="widget">
+            <h3>Comments</h3>
+            <div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function scrollButtonClick(e) {
+        var button = $(e.currentTarget);
+        var scrollToLeft = button.find(".k-i-arrow-chevron-left").length !== 0;
+        var scrollContainer = $(".k-card-deck").eq(0);
+        var lastCard = scrollContainer.find(".k-card").last();
+        var cardWidth = lastCard.outerWidth(true);
+
+
+        if (scrollToLeft) {
+            scrollContainer.scrollLeft(scrollContainer.scrollLeft() - cardWidth);
+        } else {
+            scrollContainer.scrollLeft(scrollContainer.scrollLeft() + cardWidth);
+        }
+    };
+
+    $(document).ready(function () {
+        var cardDeck = $(".k-card-deck-scrollwrap").eq(0);
+
+        cardDeck.on("click", ".k-button-scroll", scrollButtonClick);
+    });
+</script>
+<style>
+    /*#example {
+        display: flex;
+        justify-content: center;
+    }
+
+        .k-card-deck-scrollwrap {
+            max-width: 728px;
+        }*/
+
+    .k-card-deck {
+        box-sizing: border-box;
+        margin-left: -16px;
+        margin-right: -16px;
+        padding: 16px 16px 16px;
+        overflow-y: hidden;
+        overflow-x: auto;
+    }
+</style>
+
+@*
+
+    <style>
+        #example {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            overflow: hidden;
+        }
+
+        .dash-head {
+            max-width: 970px;
+            height: 80px;
+            background-color: #222;
+            position: relative;
+        }
+
+        .dash-head .k-rpanel-toggle {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            top: 20px;
+            left: 20px;
+        }
+
+        .panel-wrap {
+            max-width: 968px;
+            background-color: #f5f5f5;
+            border: 1px solid #e5e5e5;
+            position: relative;
+        }
+
+        #sidebar {
+            margin: 0;
+            padding: 20px 0 20px 20px;
+            vertical-align: top;
+        }
+
+        @@media (max-width: 1000px) {
+            #sidebar {
+                background: #fff;
+                padding: 20px;
+                border-left: 1px solid #e5e5e5;
+
+                /* show sidebar in container, demo only*/
+                position: absolute;
+                top: 0;
+                bottom: 0;
+            }
+
+            #sidebar.k-rpanel-expanded {
+                box-shadow: 0 0 10px rgba(0,0,0,.3);
+            }
+        }
+
+        #main-content {
+            overflow: hidden;
+            margin: 0;
+            padding: 20px;
+            min-height: 580px;
+            vertical-align: top;
+        }
+
+        /* WIDGETS */
+        .widget {
+            margin: 0 0 20px;
+            padding: 0;
+            background-color: #ffffff;
+            border: 1px solid #e7e7e7;
+            border-radius: 3px;
+        }
+
+        .widget div {
+            padding: 10px;
+            min-height: 50px;
+        }
+
+        .widget h3 {
+            font-size: 12px;
+            padding: 8px 10px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #e7e7e7;
+        }
+
+        .widget h3 span {
+            float: right;
+        }
+
+        .widget h3 span:hover {
+            cursor: pointer;
+            background-color: #e7e7e7;
+            border-radius: 20px;
+        }
+
+        /* PROFILE */
+        .profile-photo {
+            width: 80px;
+            height: 80px;
+            margin: 10px auto;
+            border-radius: 100px;
+            border: 1px solid #e7e7e7;
+            background: url(@Url.Content("./RoomGallery/01.jpg")) no-repeat 50% 50%;
+        }
+
+        #profile div {
+            text-align: center;
+        }
+
+        #profile h4 {
+            width: auto;
+            margin: 0 0 5px;
+            font-size: 1.2em;
+            color: #1f97f7;
+        }
+
+        #profile p {
+            margin: 0 0 10px;
+        }
+
+        /* BLOGS & NEWS */
+        #blogs div,
+        #news div {
+            padding: 0 20px 20px;
+        }
+
+        #teammates h4,
+        #blogs h4,
+        #news h4 {
+            width: auto;
+            margin: 20px 0 2px;
+            font-size: 1.4em;
+            color: #1f97f7;
+            font-weight: normal;
+        }
+
+        .blog-info {
+            margin: 0 0 10px;
+            font-size: .9em;
+            color: #787878;
+        }
+
+        #sidebar #blogs h4 {
+            font-size: 1em;
+        }
+
+        #sidebar #blogs p {
+            display: none;
+        }
+
+        #sidebar #blogs .blog-info {
+            display: block;
+        }
+
+        #main-content #news h4 {
+            font-size: 1.2em;
+            line-height: 1.4em;
+        }
+
+        #main-content #news h4 span {
+            display: block;
+            float: left;
+            width: 100px;
+            color: #000;
+            padding-right: 10px;
+        }
+
+        #sidebar #news h4 {
+            font-size: 1em;
+        }
+
+        #sidebar #news h4 span {
+            display: block;
+            margin-bottom: 3px;
+            color: #000;
+        }
+
+        /* TEAMMATES */
+        .team-mate:after {
+            content: ".";
+            display: block;
+            height: 0;
+            line-height: 0;
+            clear: both;
+            visibility: hidden;
+        }
+
+        #teammates .team-mate h4 {
+            font-size: 1.4em;
+            font-weight: normal;
+            margin-top: 12px;
+        }
+
+        .team-mate p {
+            margin: 0;
+        }
+
+        .team-mate img {
+            float: left;
+            margin: 0 15px 0 0;
+            border: 1px solid #e7e7e7;
+            border-radius: 60px;
+        }
+    </style>
+
+    <style>
+        .template-container {
+            margin-top: -8px;
+        }
+
+            .template-container img {
+                float: left;
+                margin: 0 4px;
+                margin-right: 10px;
+            }
+
+            .template-container h3 {
+                padding: 0 4px 4px;
+                font-size: 12px;
+                font-weight: 600;
+                margin-right: 14px;
+            }
+
+        .template-title-1 {
+            color: #65CCFF;
+        }
+
+        .template-title-2 {
+            color: #D0D03B;
+        }
+
+        .k-event .k-i-reload,
+        .k-event .k-i-non-recurrence {
+            display: none;
+        }
+    </style>
+*@

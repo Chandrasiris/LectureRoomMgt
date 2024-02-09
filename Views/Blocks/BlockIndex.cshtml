@@ -1,0 +1,70 @@
+﻿@model LectureRoomMgt.Models.Reservation.BlockVM
+@{
+    ViewBag.Title = "Faculty-Blocks";
+
+}
+
+@Html.AntiForgeryToken()
+<div class="row">
+    <div class="col-12">
+        <form id="saveForm">
+
+            <div class="form-row mb-2">
+                <div class="card-footer col-12" style="text-align:center">
+                    <div class="form-group col-6 offset-3">
+                        <label asp-for="FacultyId" class="form-label"></label><br />
+                        <select asp-for="FacultyId" asp-items="@ViewBag.Faculties as SelectList" class="form-control col-12">
+                        </select>
+
+                        <span asp-validation-for="FacultyId" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-4 offset-4" style="text-align:center">
+                <div class="form-group">
+                    <button class="btn btn-block btn-outline-info btn-lg btnView" id="B">
+                        <i class="fas fa-warehouse"></i> Blocks
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        $(".btnView").click(function (e) {
+            e.preventDefault();
+
+            if (!$('#saveForm').valid()) {
+                return false;
+            }
+
+            var blockVM = {
+                FacultyId: $('#FacultyId :selected').val(),
+                CallType: $(this).attr('id')
+            };
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("BlockIndex", "Blocks")',
+                data: blockVM,
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+
+            }).done(function (response) {
+                if (response.status == "1") {
+                    window.location.replace(response.redirectUrl);
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (response) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+
+  });
+</script>
+

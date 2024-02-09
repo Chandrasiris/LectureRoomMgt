@@ -1,0 +1,385 @@
+﻿@model LectureRoomMgt.Models.MasterCompany;
+@inject IAuthorizationService authorization
+
+@{
+    ViewBag.Title = "University";
+    ViewBag.View = "University";
+
+    var photoPath = "/Resources/DefaultUni.png";
+
+    if (Model != null)
+    {
+        if (Model.ProfileImgPath != null)
+        {
+            photoPath = "/Resources/Uploads/University/" + Model.ProfileImgPath;
+        }
+    }
+}
+
+
+
+<link href="~/Theme/plugins/select2/css/select2.min.css" rel="stylesheet" />
+<link href="~/Theme/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css" rel="stylesheet" />
+
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form id="saveForm">
+
+                    <div class="form-row">
+                        <div class="col-9">
+                            <div class="card card-dark card-outline">
+                                <div class="card-header">
+                                    <h3 class="card-title">General Details</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-row">
+                                        <div class="form-group col-md-9">
+                                            <label asp-for="CompanyName" class="control-label disabled"></label>
+                                            <input asp-for="CompanyName" class="form-control" style="text-transform:uppercase" />
+                                            <span asp-validation-for="CompanyName" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group  col-md-3">
+                                            <label asp-for="ShortName" class="control-label"></label>
+                                            <input asp-for="ShortName" class="form-control" style="text-transform:uppercase" />
+                                            <span asp-validation-for="ShortName" class="text-danger"></span>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group col-md-3">
+                                            <label asp-for="Telephone" class="control-label"></label>
+                                            <input asp-for="Telephone" class="form-control" />
+                                            <span asp-validation-for="Telephone" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <label asp-for="WorkTelephone" class="control-label"></label>
+                                            <input asp-for="WorkTelephone" class="form-control" />
+                                            <span asp-validation-for="WorkTelephone" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label asp-for="CompanyEmail" class="control-label"></label>
+                                            <input asp-for="CompanyEmail" class="form-control" />
+                                            <span asp-validation-for="CompanyEmail" class="text-danger"></span>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group col-12">
+                                            <label asp-for="Address" class="control-label"></label>
+                                            <input asp-for="Address" class="form-control" />
+                                            <span asp-validation-for="Address" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="card card-dark card-outline">
+                                <div class="card-header">
+                                    <h3 class="card-title">Social Media</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-row">
+                                        <div class="form-group col-7">
+                                            <div class="input-group mb-3">
+                                                <input asp-for="LinkedIn" class="form-control" placeholder="LinkedIn Link" />
+                                                <div class="input-group-append">
+                                                    <div class="input-group-text">
+                                                        <span class="fab fa-linkedin"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <span asp-validation-for="LinkedIn" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group col-7">
+                                            <div class="input-group mb-3">
+                                                <input asp-for="Facebook" class="form-control" placeholder="Facebook Link" />
+                                                <div class="input-group-append">
+                                                    <div class="input-group-text">
+                                                        <span class="fab fa-facebook"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <span asp-validation-for="Facebook" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group col-7">
+                                            <div class="input-group mb-3">
+                                                <input asp-for="Instagram" class="form-control" placeholder="Instagram Link" />
+                                                <div class="input-group-append">
+                                                    <div class="input-group-text">
+                                                        <span class="fab fa-instagram"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <span asp-validation-for="Instagram" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group col-7">
+                                            <div class="input-group mb-3">
+                                                <input asp-for="Twitter" class="form-control" placeholder="Twitter Link" />
+                                                <div class="input-group-append">
+                                                    <div class="input-group-text">
+                                                        <span class="fab fa-twitter"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <span asp-validation-for="Twitter" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group col-7">
+                                            <div class="input-group mb-3">
+                                                <input asp-for="Youtube" class="form-control" placeholder="Youtube Link" />
+                                                <div class="input-group-append">
+                                                    <div class="input-group-text">
+                                                        <span class="fab fa-youtube"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <span asp-validation-for="Youtube" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+                            <div class="card card-dark card-outline">
+                                <div class="card-header">
+                                    <h3 class="card-title">Email Account</h3>
+                                </div>
+                                <div class="card-body">
+                                    <input asp-for="MEmailPassword" class="form-control" style="display:none" />
+
+                                    <div class="form-row">
+                                        <div class="form-group col-7">
+                                            <div class="input-group mb-3">
+                                                <input asp-for="Email" class="form-control" placeholder="Email address" />
+                                                <div class="input-group-append">
+                                                    <div class="input-group-text">
+                                                        <span class="fas fa-envelope"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <span asp-validation-for="Email" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-4 offset-1">
+                                            <span asp-validation-for="EmailPassword" class="text-danger"></span>
+                                            <div class="input-group mb-3">
+                                                <input asp-for="EmailPassword" type="password" class="form-control" placeholder="Email password" />
+                                                <div class="input-group-append">
+                                                    <div class="input-group-text">
+                                                        <span class="fas fa-lock"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-3">
+                            <div class="card card-dark card-outline">
+                                <div class="card-header">
+                                    <h3 class="card-title">Picture</h3>
+                                </div>
+                                <div class="img-thumbnail" id="imgPreview">
+
+                                    <img class="img-thumbnail" style="border-radius:50%" id="targetImg" src="@photoPath" />
+
+                                    <div class="caption">
+                                        @if (Model != null)
+                                        {
+                                            if (Model.ProfileImgPath != null)
+                                            {
+                                                <a id="trashbtn"><i class="fas fa-trash-alt"></i></a>
+                                                <span id="description" style="font-size:12px"></span>
+                                            }
+                                            else
+                                            {
+                                                <a id="trashbtn" style="display:none"><i class="fas fa-trash-alt"></i></a>
+                                                <span id="description" style="font-size:12px"></span>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <a id="trashbtn" style="display:none"><i class="fas fa-trash-alt"></i></a>
+                                            <span id="description" style="font-size: 12px"></span>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="btn-xs">
+                                    <input asp-for="UniversityImageFile" type="file" accept="image/x-png">
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="card-footer" style="text-align:center">
+                        <button id="btnSave" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Save !"><i class="fa fa-save"></i> Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" id="hiddenImageDelete" />
+
+
+
+@section Scripts
+{
+    <script src="~/Theme/plugins/select2/js/select2.full.min.js"></script>
+    <script>
+    $(document).ready(function () {
+
+        $('.select2bs4').select2({
+          theme: 'bootstrap4'
+        })
+
+        $("#trashbtn").click(function (e) {
+            e.preventDefault();
+
+            $("#UniversityImageFile").val('');
+            $("#description").text('');
+            $("#targetImg").attr('src', '/Resources/DefaultUniversity.png');
+            $("#trashbtn").hide();
+
+            $("#hiddenImageDelete").val(true);
+        });
+
+        var imageChange = false;
+
+        $('#UniversityImageFile').change(function () {
+
+            var File = this.files;
+
+            if (File[0].type != "image/png") {
+
+               toastr.warning('Only PNG files are allowed !');
+               $("#UniversityImageFile").val('');
+               return false;
+            }
+
+            if (File && File[0]) {
+
+                imageChange = true;
+                ReadImage(File[0]);
+            }
+        });
+
+        var ReadImage = function (file) {
+
+            var reader = new FileReader;
+            var image = new Image;
+
+            reader.readAsDataURL(file);
+            reader.onload = function (_file) {
+
+                image.src = _file.target.result;
+                image.onload = function () {
+
+                    var height = this.height;
+                    var width = this.width;
+                    var type = file.type;
+                    var sizetoKB = file.size / 1024;
+                    var size = ~~(file.size / 1024) + "KB";
+
+                    if (sizetoKB > 1024) {
+                        $("#upImage").val('');
+                        alert("Image should be less than 1MB");
+                        return false;
+                    }
+
+                    $("#targetImg").attr('src', _file.target.result);
+                    $("#description").text("Size:" + size + ", " + height + "X " + width + ", " + type + "");
+                    $("#trashbtn").show();
+                }
+            }
+        }
+
+
+        $("#btnSave").click(function (e) {
+            e.preventDefault();
+
+            if (!$('#saveForm').valid()) {
+                return false;
+            }
+
+            var file = $("#UniversityImageFile").get(0).files;
+            var uniData = new FormData;
+
+            uniData.append("CompID", $('#CompID').val());
+            uniData.append("CompanyName", $('#CompanyName').val());
+            uniData.append("ShortName", $('#ShortName').val());
+            uniData.append("Email", $('#Email').val());
+            uniData.append("EmailPassword", $('#EmailPassword').val());
+            uniData.append("MEmailPassword", $('#MEmailPassword').val());
+            uniData.append("Address", $('#Address').val());
+            uniData.append("Telephone", $('#Telephone').val());
+            uniData.append("WorkTelephone", $('#WorkTelephone').val());
+            uniData.append("CompanyEmail", $('#CompanyEmail').val());
+            uniData.append("Twitter", $('#Twitter').val());
+            uniData.append("Facebook", $('#Facebook').val());
+            uniData.append("LinkedIn", $('#LinkedIn').val());
+            uniData.append("Instagram", $('#Instagram').val());
+            uniData.append("Youtube", $('#Youtube').val());
+
+            uniData.append("IsImageDeleted", $("#hiddenImageDelete").val());
+            uniData.append("IsImageChange", imageChange);
+            uniData.append("UniversityImageFile", file[0]);
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: '@Url.Action("CreateUniversity", "Admin")',
+                data: uniData,
+                contentType: false,
+                processData: false,
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                if (response.status == "1") {
+                    toastr.success('Saved successfully !');
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (response) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+    });
+
+    </script>
+}

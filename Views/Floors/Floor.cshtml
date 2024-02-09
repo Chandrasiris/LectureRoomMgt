@@ -1,0 +1,174 @@
+﻿@{ 
+    ViewBag.Title = "Floor";
+
+    var ModClaimCheck = true;
+    var DelClaimCheck = true;
+    var NewClaimCheck = true;
+}
+
+@using Kendo.Mvc.UI
+@using Kendo.Mvc
+
+
+<link href="~/custom/css/kendo.bootstrap-main.css" rel="stylesheet" />
+<script src="~/custom/js/jszip.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_jquery.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.all.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.aspnetmvc.min.js"></script>
+
+
+<style>
+    .k-grid tbody tr {
+        line-height: 14px;
+    }
+
+    .k-grid tbody td {
+        padding: 5px;
+    }
+
+    .k-grid-save-changes:hover {
+        background-color: #5cb85c;
+    }
+
+    .k-grid-delete-custom {
+        background-color: tomato;
+    }
+
+    .k-grid-cancel-changes:hover {
+        background-color: red;
+    }
+
+    .k-grid-excel:hover {
+        background-color: forestgreen;
+    }
+
+    .k-grid-pdf:hover {
+        background-color: red;
+    }
+
+    .k-grid .k-grid-toolbar .k-grid-add,
+    .k-grid .k-grid-toolbar .k-grid-save-changes,
+    .k-grid .k-grid-toolbar .k-grid-cancel-changes,
+    .k-grid .k-grid-toolbar .k-grid-delete-custom {
+        min-width: 0;
+    }
+
+        .k-grid .k-grid-toolbar .k-grid-add .k-icon,
+        .k-grid .k-grid-toolbar .k-grid-save-changes .k-icon,
+        .k-grid .k-grid-toolbar .k-grid-cancel-changes .k-icon,
+        .k-grid .k-grid-toolbar .k-grid-delete-custom .k-icon {
+            margin: 0;
+        }
+</style>
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="mb-2">
+            <a asp-controller="Floors" asp-action="FloorIndex" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="bottom" title="Back to main screen !"><i class="fas fa-arrow-alt-circle-left"></i> Back</a>
+        </div>
+
+        <div class="card card-primary card-outline">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-landmark"></i>
+                    Floors - Block <b>@ViewBag.BlockName</b> of <b>@ViewBag.FacultyName</b> Faculty
+                </h3>
+            </div>
+
+            <div class="card-body">
+                @(Html.Kendo().Grid<LectureRoomMgt.Models.Reservation.FloorVM>()
+                .Name("FloorsGrid")
+                .Columns(columns =>
+                {
+                    columns.Select().Width(40).HeaderHtmlAttributes(new { @style = "text-align:center" }).HtmlAttributes(new { @style = "text-align:center" });
+                    columns.Bound(p => p.FloorName);
+                    columns.Bound(p => p.Comment);
+                    columns.Bound(p => p.Status);
+                    columns.Bound(p => p.Id).Hidden();
+                })
+                        .ToolBar(toolbar =>
+                        {
+                            if (NewClaimCheck)
+                            {
+                                toolbar.Create().Text(" ").HtmlAttributes(new { @class = "bg-info" });
+                            }
+                            toolbar.Save().Text(" ").CancelText(" ");
+                            {
+                                if (DelClaimCheck)
+                                {
+                                    toolbar.Custom().Text(" ").IconClass("k-icon k-i-trash").HtmlAttributes(new { @class = "k-grid-delete-custom" });
+                                }
+                            }
+
+                            toolbar.Excel().Text("Excel").HtmlAttributes(new { @class = "ml-5" });
+                            toolbar.Pdf().Text("Pdf");
+                            toolbar.Search();
+                        })
+                .Selectable(selectable => selectable.Mode(GridSelectionMode.Multiple))
+                .Editable(editable =>
+                {
+                    if (ModClaimCheck)
+                    {
+                        editable.Mode(GridEditMode.InCell).DisplayDeleteConfirmation(false);
+                    }
+                })
+                .Pageable()
+                .ColumnMenu(col => col.Filterable(false))
+                .Navigatable()
+                .Sortable()
+                .Scrollable()
+                .Resizable(resize => resize.Columns(true))
+                .Reorderable(r => r.Columns(true))
+                .Filterable()
+                .DataSource(dataSource => dataSource
+                      .Ajax()
+                      .Batch(true)
+                      .PageSize(15)
+                      .ServerOperation(false)
+                      .Events(events => events.Error("floor_err"))
+                      .Model(model =>
+                      {
+                          model.Id(floor => floor.Id);
+                      })
+                      //.Aggregates(aggregates =>
+                      //   {
+                      //       aggregates.Add(p => p.FacultyName).Count();
+                      //})
+                      .Create(create => create.Action("CreateFloor", "Floors", new { BlockId = ViewBag.BlockId }))
+                      .Read(read => read.Action("LoadFloors", "Floors", new { BlockId = ViewBag.BlockId }))
+                      .Update(update => update.Action("EditFloor", "Floors", new { BlockId = ViewBag.BlockId }))
+                      .Destroy(destroy => destroy.Action("DeleteFloor", "Floors", new { BlockId = ViewBag.BlockId }))
+                   )
+                )
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $("#FloorsGrid").on("click", ".k-grid-delete-custom", function (e) {
+        e.preventDefault();
+
+        var grid = $("#FloorsGrid").data("kendoGrid");
+        grid.select().each(function () {
+            grid.removeRow($(this));
+        });
+    });
+
+
+    function floor_err(e) {
+        if (e.errors) {
+            var message = "";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "</br>";
+                    });
+                }
+            });
+            toastr.error(message);
+        }
+    }
+</script>

@@ -1,0 +1,153 @@
+﻿@using LectureRoomMgt.Models.Reservation
+@using Kendo.Mvc.UI
+@model FeedBackRoom
+<script src="~/custom/js/jszip.js"></script>
+<link href="~/custom/css/bootstrap-main.css" rel="stylesheet" />
+<link href="~/custom/css/kendo.bootstrap-v4.min.css" rel="stylesheet" />
+<link href="~/custom/css/kendo.bootstrap-main.css" rel="stylesheet" />
+<script src="~/custom/js/kendo.all.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_jquery.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.all.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.aspnetmvc.min.js"></script>
+<script src="~/custom/js/kendo.aspnetmvc.min.js"></script>
+
+<div class="container">
+    <form asp-action="submitFeedback" asp-controller="RoomFeedback">
+        <div>
+            <p>Are you satisfied?</p>
+            <div class="item">
+
+                <input class="radio" type="radio" name="ResponseType" id="1" value="1" onclick="show();">
+                <span>😁 Happy</span>
+                <input class="radio" type="radio" name="ResponseType" id="2" value="2" onclick="show2();">
+                <span>🙁 Unhappy</span>
+                <input class="radio" type="radio" name="ResponseType" id="3" value="3" onclick="show2();">
+                <span>😶 Neutral</span>
+
+            </div>
+        </div>
+        <div id="rate" class="hide">
+            <p>Rating</p>
+            @(Html.Kendo().Rating()
+                   .Name("stars")
+                )
+        </div>
+        <div class="row">
+            <div>
+                <textarea id="Description" name="Description" placeholder="Write something.." style="height:200px"></textarea>
+            </div>
+        </div>
+        <h6>Faculty:</h6>
+        @(Html.Kendo().DropDownList()
+                    .Name("FacultyId")
+                    .HtmlAttributes(new { style = "width:100%" })
+                    .OptionLabel("Select faculty...")
+                    .DataTextField("FacultyName")
+                    .DataValueField("Id")
+                    .DataSource(source =>
+                    {
+                    source.Read(read =>
+                    {
+                    read.Action("GetFaculties", "Room");
+                    });
+                    })
+                )
+        <h6 style="margin-top: 2em;">Block:</h6>
+        @(Html.Kendo().DropDownList()
+                    .Name("BlockId")
+                    .HtmlAttributes(new { style = "width:100%" })
+                    .OptionLabel("Select block...")
+                    .DataTextField("BlockName")
+                    .DataValueField("Id")
+                    .DataSource(source =>
+                    {
+                    source.Read(read =>
+                    {
+                    read.Action("GetBlocks", "Room")
+                    .Data("filterBlocks");
+                    })
+                    .ServerFiltering(true);
+                    })
+                    .Enable(false)
+                    .AutoBind(false)
+                    .CascadeFrom("FacultyId")
+                )
+        <h6 style="margin-top: 2em;">Floor:</h6>
+        @(Html.Kendo().DropDownList()
+                    .Name("FloorId")
+                    .HtmlAttributes(new { style = "width:100%" })
+                    .OptionLabel("Select floor...")
+                    .DataTextField("FloorName")
+                    .DataValueField("Id")
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                        {
+                            read.Action("GetFloors", "Room")
+                            .Data("filterFloors");
+                        })
+                        .ServerFiltering(true);
+                    })
+                    .Enable(false)
+                    .AutoBind(false)
+                    .CascadeFrom("BlockId")
+                )
+        <h6 style="margin-top: 2em;">Room:</h6>
+        @(Html.Kendo().DropDownList()
+                    .Name("RoomId")
+                    .HtmlAttributes(new { style = "width:100%" })
+                    .OptionLabel("Select floor...")
+                    .DataTextField("RoomName")
+                    .DataValueField("Id")
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                        {
+                            read.Action("GetRooms", "Room")
+                            .Data("filterRooms");
+                        })
+                        .ServerFiltering(true);
+                    })
+                    .Enable(false)
+                    .AutoBind(false)
+                    .CascadeFrom("FloorId")
+                )
+        <input type="submit" />
+
+    </form>
+</div>
+
+<style>
+    .hide {
+        display: none;
+    }
+</style>
+<script>
+    function show() {
+
+        document.getElementById('rate').style.display = 'block';
+
+    }
+    function show2() {
+
+        document.getElementById('rate').style.display = 'none';
+
+    }
+
+
+    function filterBlocks() {
+        return {
+            FacultyId: $("#FacultyId").val()
+        };
+    }
+    function filterFloors() {
+        return {
+            BlockId: $("#BlockId").val()
+        };
+    }
+    function filterRooms() {
+        return {
+            FloorId: $("#FloorId").val()
+        };
+    }
+</script>

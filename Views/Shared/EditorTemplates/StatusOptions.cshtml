@@ -1,0 +1,7 @@
+﻿@using Kendo.Mvc.UI 
+@model LectureRoomMgt.Models.Reservation.StatusOptionsVM
+@(Html.Kendo().DropDownListFor(m => m)    
+    .DataValueField("Id")
+    .DataTextField("StatusText")
+    .BindTo((System.Collections.IEnumerable)ViewData["statusOptions"])
+)

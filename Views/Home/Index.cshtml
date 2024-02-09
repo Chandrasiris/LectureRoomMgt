@@ -1,0 +1,107 @@
+﻿@{
+    ViewBag.Title = "Home";
+}
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+@if (ViewBag.UserType == "I")
+{
+    <div class="row">
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box">
+                <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-user-alt"></i></span>
+
+                <div class="info-box-content">
+                    <span class="info-box-text">Staff</span>
+                    <span class="info-box-number">
+                        @ViewBag.StaffCount
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box">
+                <span class="info-box-icon bg-success elevation-1"><i class="fas fa-user-alt"></i></span>
+
+                <div class="info-box-content">
+                    <span class="info-box-text">Lecturers</span>
+                    <span class="info-box-number">
+                        @ViewBag.LecturerCount
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box">
+                <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-book"></i></span>
+
+                <div class="info-box-content">
+                    <span class="info-box-text">Courses</span>
+                    <span class="info-box-number">
+                        @ViewBag.CourseCount
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box">
+                <span class="info-box-icon bg-primary elevation-1"><i class="fas fa-city"></i></span>
+
+                <div class="info-box-content">
+                    <span class="info-box-text">Faculties</span>
+                    <span class="info-box-number">
+                        @ViewBag.FacultyCount
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box">
+                <span class="info-box-icon bg-info elevation-1"><i class="fas fa-building"></i></span>
+
+                <div class="info-box-content">
+                    <span class="info-box-text">Blocks</span>
+                    <span class="info-box-number">
+                        @ViewBag.BlockCount
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box">
+                <span class="info-box-icon bg-gradient-gray elevation-1"><i class="fas fa-landmark"></i></span>
+
+                <div class="info-box-content">
+                    <span class="info-box-text">Floors</span>
+                    <span class="info-box-number">
+                        @ViewBag.FloorsCount
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box">
+                <span class="info-box-icon bg-gradient-teal elevation-1"><i class="fas fa-calendar-check"></i></span>
+
+                <div class="info-box-content">
+                    <span class="info-box-text">Upcoming Events</span>
+                    <span class="info-box-number">
+                        @ViewBag.EventCount
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box">
+                <span class="info-box-icon bg-navy elevation-1"><i class="fas fa-users"></i></span>
+
+                <div class="info-box-content">
+                    <span class="info-box-text">Users</span>
+                    <span class="info-box-number">
+                        @ViewBag.UsersCount
+                    </span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+}

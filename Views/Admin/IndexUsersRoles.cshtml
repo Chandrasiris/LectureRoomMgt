@@ -1,0 +1,77 @@
+﻿@model LectureRoomMgt.Models.ViewModels.UsersRolesViewModel;
+@inject IAuthorizationService authorization
+@{
+    ViewBag.Title = "Add users to the role";
+    ViewBag.View = ViewBag.Rolename;
+}
+
+<form>
+    <div class="card">
+        <div class="card-header">
+            Users
+        </div>
+        <div class="card-body">
+            <div class="form-row">
+                @foreach (var item in (IEnumerable<LectureRoomMgt.Models.ViewModels.UsersRolesViewModel>)ViewBag.List)
+                {
+                    <div class="form-group col-4 mb-3">
+                        <div class="custom-control custom-checkbox">
+                            <input asp-for="@item.IsSelected" type="checkbox" class="custom-control-input" id="@item.EncryptUserId">
+                            <label asp-for="@item.IsSelected" class="custom-control-label" for="@item.EncryptUserId">@item.Username</label>
+                        </div>
+                    </div>
+                }
+            </div>
+
+        </div>
+        @if ((await authorization.AuthorizeAsync(User, "CreateRoleUser")).Succeeded)
+        {
+            <div class="card-footer">
+                <a asp-controller="Admin" asp-action="IndexRoles" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="bottom" title="Back to roles !"><i class="fas fa-arrow-alt-circle-left"></i> Back</a>
+                <button id="btnSave" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Update !"><i class="fa fa-save"></i> Update</button>
+            </div>
+
+        }
+    </div>
+</form>
+<input type="hidden" id="hiddenRoleID" value="@ViewBag.RoleId" />
+
+<script>
+    $(document).ready(function () {
+
+        $("#btnSave").click(function (e) {
+            e.preventDefault();
+
+            var list = [];
+            $('input[type=checkbox]').each(function () {
+
+                var listItem = {
+                    UserId: $(this).attr('id'),
+                    IsSelected: $(this).is(':checked')
+                }
+                list.push(listItem);
+            });
+
+            var UserRoleObj = {
+                userRoleList : list,
+                roleId: $('#hiddenRoleID').val()
+            };
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("CreateUsersRoles", "Admin")',
+                data: UserRoleObj,
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                if (response.status == "1") {
+                    toastr.success('Saved successfuly !');
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (response) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+    });
+</script>

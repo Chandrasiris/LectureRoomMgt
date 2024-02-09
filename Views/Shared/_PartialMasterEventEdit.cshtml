@@ -1,0 +1,18 @@
+﻿@model LectureRoomMgt.Models.Events.MasterEvent;
+
+
+@Html.AntiForgeryToken()
+<form id="editForm">
+    <div class="form-row">
+        <input type="hidden" asp-for="EncryptEventId" class="form-control" />
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-12">
+            <label asp-for="MEventName" class="control-label"></label>
+            <input asp-for="MEventName" class="form-control" />
+            <span asp-validation-for="MEventName" class="text-danger"></span>
+        </div>
+    </div>
+</form>
+

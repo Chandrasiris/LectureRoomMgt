@@ -1,0 +1,145 @@
+﻿@using Kendo.Mvc.UI
+@using Kendo.Mvc
+
+
+<link href="~/custom/css/kendo.bootstrap-main.css" rel="stylesheet" />
+<script src="~/custom/js/jszip.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_jquery.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.all.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.aspnetmvc.min.js"></script>
+
+
+<style>
+    .k-grid tbody tr {
+        line-height: 14px;
+    }
+
+    .k-grid tbody td {
+        padding: 5px;
+    }
+
+    .k-grid-save-changes:hover {
+        background-color: #5cb85c;
+    }
+
+    .k-grid-delete-custom {
+        background-color: tomato;
+    }
+
+    .k-grid-cancel-changes:hover {
+        background-color: red;
+    }
+
+    .k-grid-excel:hover {
+        background-color: forestgreen;
+    }
+
+    .k-grid-pdf:hover {
+        background-color: red;
+    }
+
+    .k-grid .k-grid-toolbar .k-grid-add,
+    .k-grid .k-grid-toolbar .k-grid-save-changes,
+    .k-grid .k-grid-toolbar .k-grid-cancel-changes,
+    .k-grid .k-grid-toolbar .k-grid-delete-custom {
+        min-width: 0;
+    }
+
+    .k-grid .k-grid-toolbar .k-grid-add .k-icon,
+    .k-grid .k-grid-toolbar .k-grid-save-changes .k-icon,
+    .k-grid .k-grid-toolbar .k-grid-cancel-changes .k-icon,
+    .k-grid .k-grid-toolbar .k-grid-delete-custom .k-icon {
+        margin: 0;
+    }
+</style>
+
+
+<div class="card border-top border-0 border-4 border-info">
+    <div class="card-body">
+        <div class="border p-4 rounded">
+            <div class="card-title d-flex align-items-center">
+                <div>
+                    <i class="bx bxs-home me-1 font-22 text-info"></i>
+                </div>
+                <h5 class="mb-0 text-info">Room Facilities</h5>
+            </div><br />
+            <hr />
+
+            <input id="roomId" value=@ViewData["roomName"] type="hidden" />
+            
+            <br />
+
+            @(Html.Kendo().Grid<LectureRoomMgt.Models.Reservation.RoomFacilityVM>()
+            .Name("RoomFacGrid")
+            .Columns(columns =>
+            {
+                columns.Bound(p => p.FacilityCategoryDDL).Title("Category").ClientTemplate("#=FacilityCategoryDDL.Category#");
+                columns.Bound(p => p.Comment).Title("Description");
+                columns.Bound(p => p.Qty);
+            })
+            .ToolBar(toolbar =>
+            {
+                toolbar.Create().Text(" ").HtmlAttributes(new { @class = "bg-info" });
+                toolbar.Save().Text(" ").CancelText(" ");
+
+                toolbar.Excel().Text("Excel").HtmlAttributes(new { @class = "ml-5" });
+                toolbar.Pdf().Text("Pdf");
+                toolbar.Search();
+            })
+            .Selectable(selectable => selectable.Mode(GridSelectionMode.Multiple))
+            .Editable(editable =>
+            {
+                editable.Mode(GridEditMode.InCell).DisplayDeleteConfirmation(false);
+            })
+            .Pageable()
+            .ColumnMenu(col => col.Filterable(false))
+            .Navigatable()
+            .Sortable()
+            .Scrollable()
+            .Resizable(resize => resize.Columns(true))
+            .Reorderable(r => r.Columns(true))
+            .Filterable()
+            .DataSource(dataSource => dataSource
+                .Ajax()
+                .Batch(true)
+                .PageSize(20)
+                .ServerOperation(false)
+                .Events(events => events.Error("errorHandler"))
+                .Model(model =>
+                {
+                    model.Id(p => p.Id);
+                    model.Field(p => p.FacilityCategoryDDL).DefaultValue(ViewData["defaultFacilityCategory"] as LectureRoomMgt.Models.Reservation.FacilityCategoryDDL);
+                })
+                .Read(read => read.Action("Read", "RoomFacility").Data("RoomCodeF"))
+                .Create(create => create.Action("Create", "RoomFacility").Data("RoomCodeF"))
+              )
+            )
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function errorHandler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            toastr.error(message);
+        }
+    }
+    function RoomCodeF() {
+        var x =@ViewData["roomId"];// document.getElementById("roomId").value;
+        return { RoomId : x }
+    }
+</script>
+<style>
+
+    .fieldlist {
+        margin: 0 0 -1em;
+        padding: 0;
+    }
+</style>

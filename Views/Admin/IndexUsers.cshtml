@@ -1,0 +1,355 @@
+﻿@model LectureRoomMgt.Models.ViewModels.UserViewModel;
+@inject IAuthorizationService authorization
+@{
+    ViewBag.Title = "Users";
+    ViewBag.View = "Users";
+
+    var ModClaimCheck = (await authorization.AuthorizeAsync(User, "ModifyUser")).Succeeded ? "true" : "false";
+    var DelClaimCheck = (await authorization.AuthorizeAsync(User, "RemoveUser")).Succeeded ? "true" : "false";
+    var UserClaimCheck = (await authorization.AuthorizeAsync(User, "ViewUserClaim")).Succeeded ? "true" : "false";
+}
+
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit user</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="myModalBody">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success btn-sm" id="btnEdit">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Are you sure?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="myModalBody">
+                <p>Do you really want to delete this record?<br /> <b>This process cannot be undone</b>.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger btn-sm" id="btnDelete">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="errorModalLabel">404 Error Page</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="myModalBody">
+                <div class="error-page">
+                    <h2 class="headline text-warning">404</h2>
+
+                    <div class="error-content">
+                        <h3><i class="fas fa-exclamation-triangle text-warning"></i> Oops! Page not found..</h3>
+                        <p>
+                            Meanwhile, you may <a href='@Url.Action("Index", "Home")'>return to HOME</a> or contact the system administrator.
+                        </p>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@Html.AntiForgeryToken()
+@if ((await authorization.AuthorizeAsync(User, "CreateUser")).Succeeded)
+{
+    <div class="row">
+        <div class="col-4 offset-4">
+            <form id="saveForm">
+                <div class="form-row">
+                    <div class="form-group col-9 mb-3">
+                        <label asp-for="Username" class="control-label"></label>
+                        <input asp-for="Username" class="form-control" />
+                        <span asp-validation-for="Username" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-9 mb-3">
+                        <label asp-for="Password" class="control-label"></label>
+                        <input asp-for="Password" class="form-control" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-3 mb-3 mt-4">
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-info btn-sm" data-container="body" data-toggle="popover" data-placement="right" data-content="<ul><li>Passwords must be at least 6 characters.</li><li>Passwords must have at least one non alphanumeric character.</li><li>Passwords must have at least one digit ('0'-'9').</li><li>Passwords must have at least one uppercase ('A'-'Z').</li></ul>"><i class="fas fa-info-circle"></i> Info</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-9 mb-3">
+                        <label asp-for="ConfirmPassword" class="control-label"></label>
+                        <input asp-for="ConfirmPassword" class="form-control" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-3 mb-3 mt-4">
+                        <div class="mt-2">
+                            <button id="btnSave" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Save !"><i class="fa fa-save"></i> Save</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <hr />
+
+}
+
+<table id="infoTable" class="table table-hover table-striped">
+    <thead>
+        <tr class="info" style="background-color:gainsboro">
+            <th colspan="2" style="text-align:center;border-right-style:groove">
+                @Html.DisplayName("Information")
+            </th>
+            <th colspan="3" style="text-align:center">
+                @Html.DisplayName("Action")
+            </th>
+        </tr>
+
+
+        <tr class="info">
+            <th>
+                @Html.DisplayNameFor(model => model.Username)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+            </th>
+            <th>
+            </th>
+            <th>
+            </th>
+
+        </tr>
+
+    </thead>
+</table>
+<input type="hidden" id="hiddenUserID" />
+
+<script>
+   $(document).ready(function () {
+
+        var table = $('#infoTable').DataTable({
+            "ajax": '@Url.Action("UsersLoad", "Admin")',
+            "columnDefs": [
+                    { "targets": [1], "visible": false, "searchable": false },
+                    { "targets": [2], "visible": @ModClaimCheck, "width": "10px" },
+                    { "targets": [3], "visible": @DelClaimCheck, "width": "10px" },
+                    { "targets": [4], "visible": @UserClaimCheck,"width": "55px" }
+
+                ],
+            "columns": [
+                        { "data": "Username", "autowidth": true },
+                        { "data": "Email", "autowidth": true },
+                        { "data": "EncryptUserId", "render": function (data, type, row)
+                                {
+                                    return '<a id="' + data + '" class="btn btn-warning btn-xs tblBtnEdit" href="#" data-toggle="tooltip" data-placement="bottom" title="Edit!"> <span class="fas fa-edit"></span> </a>';
+                                },"orderable": false
+                        },
+                        { "data": "EncryptUserId", "render": function (data, type, row)
+                                {
+                                    return '<a id="' + data + '" class="btn btn-danger btn-xs tblBtnDelete" href="#" data-toggle="tooltip" data-placement="bottom" title="Delete!"> <span class="fas fa-trash-alt"></span> </a>';
+                                },"orderable": false
+                        },
+                        { "data": "EncryptUserId", "render": function (data, type, row)
+                                {
+                                   return ' <a href="/Admin/IndexUsersClaims?userId='+ data +'"  class="btn btn-info btn-xs" data-toggle="tooltip" data-placement="bottom" title="Add/Remove claims !"><i class="fas fa-list-ul"></i> Claims</a>'
+                                },"orderable": false
+                        }
+                ],
+            "scrollY": "300px",
+            "scrollCollapse": true,
+            "autoWidth": true,
+            "processing": true,
+            "rowId": 'EncryptUserId'
+        });
+
+        $('#infoTable').on('click', '.tblBtnEdit', function () {
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("EditUser", "Admin")',
+                contentType: "application/json; charset=utf-8",
+                data: { id: $(this).attr('id') },
+                datatype: "json",
+            }).done(function (response) {
+                if (response.status != "1") {
+                    $('#myModalBody').html(response);
+                    $('#editModal').modal('show');
+                }
+                else {
+                   $('#errorModal').modal('show');
+                }
+            });
+        });
+
+        $('#infoTable').on('click', '.tblBtnDelete', function () {
+            $("#hiddenUserID").val($(this).attr('id'));
+            $('#deleteModal').modal('show');
+        });
+
+
+        $(function () {
+            $('[data-toggle="popover"]').popover({
+                html: true
+            });
+        });
+
+        $("#btnSave").click(function (e) {
+            e.preventDefault();
+
+            if (!$('#saveForm').valid()) {
+                return false;
+            }
+            var UserObj = {
+                Username: $('#Username').val(),
+                Password: $('#Password').val(),
+                ConfirmPassword: $('#ConfirmPassword').val()
+            };
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: '@Url.Action("CreateUser", "Admin")',
+                dataType: "json",
+                data: JSON.stringify(UserObj),
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                if (response.status == "1") {
+                    $('#Username').val('');
+                    $('#Password').val('');
+                    $('#ConfirmPassword').val('');
+
+                    table.row.add({
+                        "Username": response.registerViewModel['Username'],
+                        "Email": response.registerViewModel['Email'],
+                        "EncryptUserId": response.registerViewModel['EncryptUserId'],
+                        "EncryptUserId": response.registerViewModel['EncryptUserId'],
+                        "EncryptUserId": response.registerViewModel['EncryptUserId']
+                    }).draw(false);
+                    $("#countSpan").text(parseInt($("#countSpan").text()) + 1);
+
+                    toastr.success('Saved successfully !');
+                }
+                else if (response.status == "2") {
+                    toastr.warning(response.message);
+                }
+                else if (response.status == "3") {
+                    toastr.warning('Password is not strong, see the info for a strong password !');
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (response) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+
+
+        $("#btnEdit").click(function () {
+
+            $.validator.unobtrusive.parse($('#editForm'));
+
+            if (!$('#editForm').valid()) {
+                return false;
+            }
+
+            var UserObj = {
+                EncryptUserId : $('#EncryptUserId').val(),
+                Username: $('#MUsername').val(),
+                Password: $('#MPassword').val(),
+                ConfirmPassword: $('#MConfirmPassword').val()
+            };
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: '@Url.Action("EditUser", "Admin")',
+                dataType: "json",
+                data: JSON.stringify(UserObj),
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                if (response.status == "1") {
+                    $('#editModal').modal('hide');
+
+                    table.row('#' + $('#EncryptUserId').val()).remove().draw(false);
+                    table.row.add({
+                            "Username": response.registerViewModel['Username'],
+                            "Email": response.registerViewModel['Email'],
+                            "EncryptUserId": response.registerViewModel['EncryptUserId'],
+                            "EncryptUserId": response.registerViewModel['EncryptUserId'],
+                            "EncryptUserId": response.registerViewModel['EncryptUserId']
+                    }).draw(false);
+
+                    toastr.success('Updated successfully !');
+                }
+                else {
+                    toastr.warning('Password is not strong enough !');
+                }
+            }).fail(function (response) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+
+
+        $("#btnDelete").click(function (e) {
+            e.preventDefault();
+            var UserId = $("#hiddenUserID").val();
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: '@Url.Action("DeleteUser", "Admin")',
+                dataType: "json",
+                data: JSON.stringify(UserId),
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                if (response.status == "1") {
+                    $('#deleteModal').modal('hide');
+                    table.row('#'+ UserId).remove().draw(false);
+                    $("#countSpan").text(parseInt($("#countSpan").text()) - 1);
+                    toastr.success('Deleted successfully !');
+                }
+                else if(response.status == "2") {
+                    toastr.error('System default Admin account cannot be deleted !');
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (jqXHR, textStatus) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+    });
+</script>

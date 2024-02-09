@@ -1,0 +1,113 @@
+﻿@using Kendo.Mvc.UI
+<link href="~/custom/css/kendo.bootstrap-v4.min.css" rel="stylesheet" />
+<link href="~/custom/css/kendo.bootstrap-main.css" rel="stylesheet" />
+<script src="~/custom/js/kendo.all.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_jquery.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.all.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.aspnetmvc.min.js"></script>
+<script src="~/custom/js/kendo.aspnetmvc.min.js"></script>
+
+<div class="panel-wrap">    
+    <div id="main-content">
+        <div id="news" class="widget">
+            <h4>Current schedule</h4>
+            <div>                
+                @{ var d = System.DateTime.Now;}
+                @(Html.Kendo().Scheduler<LectureRoomMgt.Models.Scheduler.Meeting>()
+                    .Name("scheduler")
+                    .Date(new DateTime(d.Year, d.Month, d.Day))
+                    .Editable(false)
+                    .StartTime(new DateTime(d.Year, d.Month, d.Day, 7, 00, 00))
+                    .EndTime(new DateTime(d.Year, d.Month, d.Day, 20, 00, 00))
+                    .Height(600)
+                    .EventTemplateId("event-template")
+                    .Views(views =>
+                    {
+                        views.DayView();
+                        views.AgendaView(week =>
+                        {
+                            week.Selected(true);
+                        });
+                        views.WeekView();
+                        views.MonthView();
+                    })
+                    .Resources(resource =>
+                    {
+                        resource.Add(m => m.Attendee)
+                        .Title("Attendee")
+                        .DataTextField("Text")
+                        .DataValueField("Value")
+                        .DataColorField("Color")
+                        .BindTo(new[] {
+                            new { Text = "Lecturer", Value = 1, Color = "#eaf8ff" }
+                        });
+                    })
+                    .DataSource(d => d
+                        .Model(m =>
+                        {
+                            m.Id(f => f.MeetingID);
+                            m.Field(f => f.Title).DefaultValue("No title");
+                            m.Field(f => f.Attendee).DefaultValue(1);
+                        })
+                        .Read("Overview_Read", "Reservation",new { roomId = ViewBag.roomId })                   
+                    )
+                )
+
+                <style>
+                    .template-container {
+                        margin-top: -8px;
+                    }
+                        .template-container img {
+                            float: left;
+                            margin: 0 4px;
+                            margin-right: 10px;
+                        }
+                        .template-container h3 {
+                            padding: 0 4px 4px;
+                            font-size: 12px;
+                            font-weight: 600;
+                            margin-right: 14px;
+                        }
+                    .template-title-1 {
+                        color: #65CCFF;
+                    }
+                    .template-title-2 {
+                        color: #D0D03B;
+                    }
+                    .k-event .k-i-reload,
+                    .k-event .k-i-non-recurrence {
+                        display: none;
+                    }
+                </style>
+            </div>
+        </div>      
+    </div>
+</div>
+<script>
+    function scrollButtonClick(e) {
+        var button = $(e.currentTarget);
+        var scrollToLeft = button.find(".k-i-arrow-chevron-left").length !== 0;
+        var scrollContainer = $(".k-card-deck").eq(0);
+        var lastCard = scrollContainer.find(".k-card").last();
+        var cardWidth = lastCard.outerWidth(true);
+        if (scrollToLeft) {
+            scrollContainer.scrollLeft(scrollContainer.scrollLeft() - cardWidth);
+        } else {
+            scrollContainer.scrollLeft(scrollContainer.scrollLeft() + cardWidth);
+        }
+    };
+    $(document).ready(function () {
+        var cardDeck = $(".k-card-deck-scrollwrap").eq(0);
+        cardDeck.on("click", ".k-button-scroll", scrollButtonClick);
+    });
+</script>
+<style>   
+    .k-card-deck {
+        box-sizing: border-box;
+        margin-left: -16px;
+        margin-right: -16px;
+        padding: 16px 16px 16px;
+        overflow-y: hidden;
+        overflow-x: auto;
+    }
+</style>

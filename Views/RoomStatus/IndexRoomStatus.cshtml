@@ -1,0 +1,116 @@
+﻿@model LectureRoomMgt.Models.Reservation.BlockVM
+@using Kendo.Mvc.UI
+<link href="~/custom/css/kendo.bootstrap-v4.min.css" rel="stylesheet" />
+<link href="~/custom/css/kendo.bootstrap-main.css" rel="stylesheet" />
+<script src="~/custom/js/kendo.all.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_jquery.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.all.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.aspnetmvc.min.js"></script>
+<script src="~/custom/js/kendo.aspnetmvc.min.js"></script>
+
+@{
+    ViewBag.Title = "Faculty-Blocks";
+}
+<style>
+    .cards-container {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .k-card {
+        width: 285px;
+        margin: 2%;
+    }
+
+    .k-card-footer {
+        text-align: center;
+    }
+</style>
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Reserve Room</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success btn-sm" id="btnEdit">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="example">
+    <div class="cards-container ml-5">
+        @foreach (var fac in (IEnumerable<LectureRoomMgt.Models.Reservation.Faculty>)ViewBag.fac)
+        {
+            float facBooked = 0;
+            float facBookingCapacity = 0;
+            <div class="k-card">
+                <div class="k-card-header">
+                    <h5 class="k-card-title">
+                        @fac.FacultyName <br />
+                    @*</div>*@
+                    @* <img class="k-card-image" src="@xy" />*@
+                    @*<div class="k-card-body">*@
+                        @foreach (var r in (IEnumerable<LectureRoomMgt.Models.Reservation.Room>)ViewBag.rooms)
+                        {
+                            facBookingCapacity += 9; //one room is for 9hours
+                            if (fac.Id == r.Floor.Block.FacultyId)
+                            {
+                                foreach (var x in (IEnumerable<LectureRoomMgt.Models.Reservation.RoomReservation>)r.RoomReservations)
+                                {
+                                    float d = (x.End.Hour - x.Start.Hour) * 60 + (x.End.Minute - x.Start.Minute);
+                                    facBooked = facBooked + d / 60;
+                                }
+                            }
+                            }
+                        @{ double c = Math.Ceiling((facBooked / facBookingCapacity) * 100);
+                            double f = 100 - c;}
+                        <span style="font-size:small; font-weight:lighter"> Free:</span><span style="color: lightgreen; font-size:small; font-weight:lighter"> @f.ToString(".0")%</span></h5>
+                </div>
+                <div class="card-footer">
+                    <div class="cards-container ml-5">
+                        @foreach (var b in (IEnumerable<LectureRoomMgt.Models.Reservation.Block>)ViewBag.Block)
+                        {
+                            if (fac.Id == b.FacultyId)
+                            {
+                                float Booked = 0;
+                                float BookingCapacity = 0;
+                            <div class="k-card">
+                                <div class="k-card-header">
+                                    <h5 class="k-card-title">
+                                        @b.BlockName <br />
+                                        @*</div>*@
+                                        @*<img class="k-card-image" src="@xy" />*@
+                                        @*<div class="k-card-body">*@
+                                        @foreach (var r in (IEnumerable<LectureRoomMgt.Models.Reservation.Room>)ViewBag.rooms)
+                                        {
+                                            BookingCapacity += 9; //one room is for 9hours
+                                            if (b.Id == r.Floor.BlockId)
+                                            {
+                                                foreach (var x in (IEnumerable<LectureRoomMgt.Models.Reservation.RoomReservation>)r.RoomReservations)
+                                                {
+                                                    float d = (x.End.Hour - x.Start.Hour) * 60 + (x.End.Minute - x.Start.Minute);
+                                                    Booked = Booked + d / 60;
+                                                }
+                                            }
+                                         }
+                                        @{ double booked = Math.Ceiling((Booked / BookingCapacity) * 100);
+                                            double free = 100 - booked;
+                                         }
+                                        <span style="font-size:small; font-weight:lighter"> Free:</span><span style="color: lightgreen; font-size:small; font-weight:lighter"> @free.ToString(".0")%</span>
+                                        &nbsp;<span><a href="@Url.Action("IndexRoomStatuDetails","RoomStatus", new { facId = fac.Id, facName=fac.FacultyName, blockName=b.BlockName, blockId=b.BlockId })" class="btn btn-block btn-outline-info">More>></a></span>
+                                    </h5>
+                                </div>
+                            </div>
+                            }
+                         }
+                    </div>               
+                </div>
+            </div>
+         }
+    </div>
+</div>

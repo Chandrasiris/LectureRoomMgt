@@ -1,0 +1,64 @@
+﻿@model LectureRoomMgt.Models.Events.UniversityEvent;
+
+<link href="~/Theme/plugins/daterangepicker/daterangepicker.css" rel="stylesheet" />
+
+@Html.AntiForgeryToken()
+<form id="editForm">
+    <div class="form-row">
+        <input type="hidden" asp-for="EncryptId" class="form-control" />
+        <div class="form-row">
+            <div class="form-group col-12">
+                <label asp-for="MEventName" class="control-label"></label>
+                <input asp-for="MEventName" class="form-control" disabled />
+            </div>
+        </div>
+
+        <div class="form-group col-12">
+            <label asp-for="MDateRange" class="control-label"></label>
+            <div class="input-group">
+                <div class="input-group-append">
+                    <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                </div>
+                <input asp-for="MDateRange" class="form-control">
+                <span asp-validation-for="MDateRange" class="text-danger"></span>
+            </div>
+        </div>
+
+    </div>
+    <div class="form-row">
+        <div class="form-group col-12">
+            <label asp-for="MIsHoliday" class="control-label"></label>
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">
+                        <input asp-for="MIsHoliday" type="checkbox">
+                    </span>
+                </div>
+                <input type="text" disabled value="Is holiday" class="form-control">
+            </div>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-12">
+            <label asp-for="MComment" class="control-label"></label>
+            <input asp-for="MComment" class="form-control"/>
+            <span asp-validation-for="MComment" class="text-danger"></span>
+        </div>
+    </div>
+
+</form>
+
+<script src="~/Theme/plugins/moment/moment.min.js"></script>
+<script src="~/Theme/plugins/daterangepicker/daterangepicker.js"></script>
+<script>
+    $(document).ready(function () {
+
+        $('#MDateRange').daterangepicker({
+          timePicker: true,
+          timePickerIncrement: 1,
+          locale: {
+            format: 'YYYY-MM-DD hh:mm A'
+          }
+        })
+    });
+</script>

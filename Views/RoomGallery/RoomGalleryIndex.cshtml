@@ -1,0 +1,58 @@
+﻿@model LectureRoomMgt.Models.Reservation.RoomImageVM
+@using Kendo.Mvc.UI
+<link href="~/custom/css/kendo.bootstrap-v4.min.css" rel="stylesheet" />
+<link href="~/custom/css/kendo.bootstrap-main.css" rel="stylesheet" />
+<script src="~/custom/js/kendo.all.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_jquery.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.all.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.aspnetmvc.min.js"></script>
+<script src="~/custom/js/kendo.aspnetmvc.min.js"></script>
+
+<h3> Image gallery</h3>
+<b>
+    @ViewData["roomName"] - @ViewData["roomId"]
+    @*Room: &nbsp;<input name="RoomName" id="roomName" value=@ViewData["roomName"] readonly /><br />
+        Id:&nbsp;<input name="RoomId" id="roomId" value=@ViewData["roomId"] readonly />*@
+</b>
+<br />
+<br />
+<div>
+    @(Html.Kendo().Upload()
+        .Name("files")
+        .Async(a => a
+            .Save("Upload", "RoomGallery",new {roomId= @ViewData["roomId"] })
+            .Remove("Remove", "RoomGallery",new { roomId = @ViewData["roomId"] })
+            .AutoUpload(true)
+        )
+    )
+</div>
+
+<div class="row">
+    @if (Model.RoomImageList != null)
+    {
+        foreach (var image in Model.RoomImageList)
+        {
+            string path = "~/RoomGallery/" + @ViewData["roomId"] + "/" + image.Ext;
+    <div class="col-sm-2">
+        <a href="@Url.Content(path)" data-toggle="lightbox" data-gallery="gallery">
+            <img src="@path" asp-append-version="true" class="img-fluid mb-2">
+        </a>
+     
+        <a href="@Url.Action("DeletePhoto","RoomGallery",new { roomId=ViewData["roomId"],roomName =ViewData["roomName"], imageId=image.Id})" style="float:right">&nbsp;&nbsp;| &nbsp;Delete</a>
+        <a href="@Url.Action("MakeDefault","RoomGallery",new { roomId=ViewData["roomId"],roomName =ViewData["roomName"], imageName=image.Ext})" style="float:right">+Default</a>
+    </div>
+        }
+    }
+</div>
+<script>
+    function onUpload(e) {
+        e.data = {
+            RoomId: ViewData["roomId"]
+        };
+    }
+    function onRemove(e) {
+        e.data = {
+            RoomId: ViewData["roomId"]
+        };
+    }
+</script>

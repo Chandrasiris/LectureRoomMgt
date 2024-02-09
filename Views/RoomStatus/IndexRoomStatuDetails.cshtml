@@ -1,0 +1,128 @@
+﻿@model LectureRoomMgt.Models.Reservation.BlockVM
+@using Kendo.Mvc.UI
+<link href="~/custom/css/kendo.bootstrap-v4.min.css" rel="stylesheet" />
+<link href="~/custom/css/kendo.bootstrap-main.css" rel="stylesheet" />
+<script src="~/custom/js/kendo.all.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_jquery.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.all.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.aspnetmvc.min.js"></script>
+<script src="~/custom/js/kendo.aspnetmvc.min.js"></script>
+
+@{
+    ViewBag.Title = "Faculty-Blocks";
+}
+<style>
+    .cards-container {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .k-card {
+        width: 285px;
+        margin: 2%;
+    }
+
+    .k-card-footer {
+        text-align: center;
+    }
+</style>
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Reserve Room</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success btn-sm" id="btnEdit">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="example">
+    <h3>@ViewBag.facName - <span>@ViewBag.blockName block</span></h3>
+    <div class="cards-container ml-5">
+        @foreach (var f in (IEnumerable<LectureRoomMgt.Models.Reservation.Floor>)ViewBag.Floor)
+        {
+            float facBooked = 0;
+            float facBookingCapacity = 0;
+            <div class="k-card">
+                <div class="k-card-header">
+                    <h5 class="k-card-title"> Floor: @f.FloorName </h5>
+                </div>
+                @*<img class="k-card-image" src="@xy" />*@
+            <div class="k-card-body">
+                @foreach (var r in (IEnumerable<LectureRoomMgt.Models.Reservation.Room>)ViewBag.rooms)
+                {
+                    if (f.Id == r.FloorId && f.BlockId==r.Floor.BlockId)
+                    {
+                        var modalName = "ImageGalleryModal" + @r.Id;
+                        var defaultImg = r.RoomImageDefaults.FirstOrDefault();
+                        var xy = "";
+                        if (defaultImg != null)
+                        {
+                            xy = "/RoomGallery/" + defaultImg.RoomId + "/" + defaultImg.ImageName;
+                        }
+                        else
+                        {
+                            xy = "/Resources/roomDefault.png";
+                        }
+                        <div class="k-card">
+                            <div class="k-card-header">
+                                <h5 class="k-card-title">@r.RoomName</h5>
+                                @*<h6 class="k-card-subtitle">@r.RoomType.Type</h6>*@
+                                <div class="ml-3">
+                                    <p>
+                                        <ul>
+                                            <li>Grade    -  @r.Grade</li>
+                                            <li>Capacity -  @r.Capacity</li>
+                                        </ul>
+                                    </p>
+                                </div>
+                            </div>
+                            <img class="k-card-image" style="width:50%" src="@xy" />
+                            <div class="ml-3">
+                                @{ float cntToday = 0;
+                                    var cntWeek = 0.0;
+                                    var cntMonth = 0.0;
+                                }
+                                @foreach (var x in (IEnumerable<LectureRoomMgt.Models.Reservation.RoomReservation>)r.RoomReservations)
+                                {
+                                    if (x.Start.Date == System.DateTime.Now.Date)
+                                    {
+                                        float d = (x.End.Hour - x.Start.Hour) * 60 + (x.End.Minute - x.Start.Minute);
+                                        cntToday = cntToday + d / 60;
+                                    }
+                                }
+                                @{
+                                    cntToday = @cntToday / 9;
+                                    float c = cntToday * 100;
+                                    float free = (1 - cntToday) * 100;
+                                }
+                                <p><span style="background-color: lightgreen;">Free: @free.ToString(".0")%</span></p>
+                            </div>
+                            <div class="card-footer">
+                                <table style="width:90%">
+                                    <tr>
+                                        <td style="width:25%"><a href="@Url.Action("ReservationIndexLecturer", "Reservation", new { facId = r.Floor.Block.FacultyId, blockId = r.Floor.BlockId, floorId = r.FloorId, roomId = r.Id })" class="btn btn-block btn-outline-success btnReserve">Book</a></td>
+                                        <td style="width:25%"><a href="@Url.Action("IndexRoomCurrentBookingDetails", "Reservation", new { roomId = r.Id })" class="btn btn-block btn-outline-info">Agenda</a></td>
+                                        <td><a href="@Url.Action("IndexRoomDetails", "Reservation", new { roomId = r.Id })" class="btn btn-block btn-outline-info">More</a></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    }
+                }
+
+
+            </div>
+               
+            </div>
+
+
+        }
+    </div>
+</div>

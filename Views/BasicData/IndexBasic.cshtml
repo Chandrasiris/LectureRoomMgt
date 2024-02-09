@@ -1,0 +1,809 @@
+﻿@model LectureRoomMgt.Models.BasicDataViewModel;
+@inject IAuthorizationService authorization
+
+@{
+    ViewBag.Title = "Basic Data";
+
+    var ModClaimCheck = (await authorization.AuthorizeAsync(User, "ModifyBasicData")).Succeeded ? "true" : "false";
+    var DelClaimCheck = (await authorization.AuthorizeAsync(User, "RemoveBasicData")).Succeeded ? "true" : "false";
+}
+
+<style>
+    table.dataTable tbody th, table.dataTable tbody td {
+        padding: 3px 10px;
+    }
+</style>
+
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="errorModalLabel">404 Error Page</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="myModalBody">
+                <div class="error-page">
+                    <h2 class="headline text-warning">404</h2>
+
+                    <div class="error-content">
+                        <h3><i class="fas fa-exclamation-triangle text-warning"></i> Oops! Page not found..</h3>
+                        <p>
+                            Meanwhile, you may <a href='@Url.Action("Index", "Home")'>return to HOME</a> or contact the system administrator.
+                        </p>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal2" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel2" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel2">Are you sure?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="myModalBody2">
+                <p>Do you really want to delete this record?<br /> <b>This process cannot be undone</b>.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger btn-sm" id="btnDelete2">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal3" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel3" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel3">Are you sure?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="myModalBody3">
+                <p>Do you really want to delete this record?<br /> <b>This process cannot be undone</b>.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger btn-sm" id="btnDelete3">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal4" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel4" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel4">Are you sure?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="myModalBody4">
+                <p>Do you really want to delete this record?<br /> <b>This process cannot be undone</b>.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger btn-sm" id="btnDelete4">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal5" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel5" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel5">Are you sure?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="myModalBody5">
+                <p>Do you really want to delete this record?<br /> <b>This process cannot be undone</b>.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger btn-sm" id="btnDelete5">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal6" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel6" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel6">Are you sure?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="myModalBody6">
+                <p>Do you really want to delete this record?<br /> <b>This process cannot be undone</b>.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger btn-sm" id="btnDelete6">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal7" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel7" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel7">Are you sure?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="myModalBody7">
+                <p>Do you really want to delete this record?<br /> <b>This process cannot be undone</b>.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger btn-sm" id="btnDelete7">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal8" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel8" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel8">Are you sure?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="myModalBody8">
+                <p>Do you really want to delete this record?<br /> <b>This process cannot be undone</b>.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger btn-sm" id="btnDelete8">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal12" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel12" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel12">Are you sure?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="myModalBody12">
+                <p>Do you really want to delete this record?<br /> <b>This process cannot be undone</b>.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger btn-sm" id="btnDelete12">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.AntiForgeryToken()
+<div class="card card-primary card-outline">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fas fa-globe"></i>
+            Basic Data
+        </h3>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-3 col-sm-3">
+                <div class="nav flex-column nav-tabs h-100" id="vert-tabs-tab" role="tablist" aria-orientation="vertical">
+                    <a class="nav-link" id="vert-tabs-title-tab" data-toggle="pill" href="#vert-tabs-title" role="tab" aria-controls="vert-tabs-title" aria-selected="false">Titles<sup id="countSpan2"><span class="badge badge-dark ml-1 title" style="font-size:small">@ViewBag.TitleCount</span></sup></a>
+                    <a class="nav-link" id="vert-tabs-gender-tab" data-toggle="pill" href="#vert-tabs-gender" role="tab" aria-controls="vert-tabs-gender" aria-selected="false">Genders<sup id="countSpan5"><span class="badge badge-dark  ml-1 gender" style="font-size:small">@ViewBag.GenderCount</span></sup></a>
+                    <a class="nav-link" id="vert-tabs-designation-tab" data-toggle="pill" href="#vert-tabs-designation" role="tab" aria-controls="vert-tabs-designation" aria-selected="false">Designations<sup id="countSpan12"><span class="badge badge-dark ml-1 designation" style="font-size:small">@ViewBag.DesignationCount</span></sup></a>
+                    <a class="nav-link" id="vert-tabs-communication-tab" data-toggle="pill" href="#vert-tabs-communication" role="tab" aria-controls="vert-tabs-communication" aria-selected="false">Communication Types<sup id="countSpan9"><span class="badge badge-dark ml-1 communication" style="font-size:small">@ViewBag.ComTypeCount</span></sup></a>
+                </div>
+            </div>
+            <div class="col-9 col-sm-9">
+                <div class="tab-content" id="vert-tabs-tabContent">
+
+                    <div class="tab-pane fade" id="vert-tabs-title" role="tabpanel" aria-labelledby="vert-tabs-title-tab">
+
+                        @if ((await authorization.AuthorizeAsync(User, "CreateBasicData")).Succeeded)
+                        {
+                            <div class="row">
+                                <div class="col-6 offset-3">
+                                    <form id="saveForm2">
+                                        <div class="form-row">
+                                            <div class="form-group col-8 mb-3">
+                                                <label asp-for="MasterTitle.Title" class="control-label"></label>
+                                                <input asp-for="MasterTitle.Title" class="form-control" />
+                                                <span asp-validation-for="MasterTitle.Title" class="text-danger"></span>
+                                            </div>
+                                            <div class="form-group col-4 mb-3 mt-4">
+                                                <div class="mt-2">
+                                                    <button id="btnSave2" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Save !"><i class="fa fa-save"></i> Save</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <hr />
+
+                        }
+
+                        <table id="titleTable" class="table table-hover table-striped">
+                            <thead>
+                                <tr class="info">
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.MasterTitle.Title)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Action")
+                                    </th>
+                                </tr>
+
+                            </thead>
+                        </table>
+                        <input type="hidden" id="hiddenTitleID" />
+
+
+                    </div>
+
+                    <div class="tab-pane fade" id="vert-tabs-gender" role="tabpanel" aria-labelledby="vert-tabs-gender-tab">
+
+                        @if ((await authorization.AuthorizeAsync(User, "CreateBasicData")).Succeeded)
+                        {
+                            <div class="row">
+                                <div class="col-6 offset-3">
+                                    <form id="saveForm5">
+                                        <div class="form-row">
+                                            <div class="form-group col-8 mb-3">
+                                                <label asp-for="MasterGender.Gender" class="control-label"></label>
+                                                <input asp-for="MasterGender.Gender" class="form-control" />
+                                                <span asp-validation-for="MasterGender.Gender" class="text-danger"></span>
+                                            </div>
+                                            <div class="form-group col-4 mb-3 mt-4">
+                                                <div class="mt-2">
+                                                    <button id="btnSave5" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Save !"><i class="fa fa-save"></i> Save</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <hr />
+
+                        }
+
+                        <table id="genderTable" class="table table-hover table-striped">
+                            <thead>
+                                <tr class="info">
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.MasterGender.Gender)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Action")
+                                    </th>
+                                </tr>
+
+                            </thead>
+                        </table>
+                        <input type="hidden" id="hiddenGenderID" />
+
+
+                    </div>
+
+                    <div class="tab-pane fade" id="vert-tabs-designation" role="tabpanel" aria-labelledby="vert-tabs-designation-tab">
+
+                        @if ((await authorization.AuthorizeAsync(User, "CreateBasicData")).Succeeded)
+                        {
+                            <div class="row">
+                                <div class="col-6 offset-3">
+                                    <form id="saveForm12">
+                                        <div class="form-row">
+                                            <div class="form-group col-8 mb-3">
+                                                <label asp-for="MasterDesignation.Designation" class="control-label"></label>
+                                                <input asp-for="MasterDesignation.Designation" class="form-control" />
+                                                <span asp-validation-for="MasterDesignation.Designation" class="text-danger"></span>
+                                            </div>
+                                            <div class="form-group col-4 mb-3 mt-4">
+                                                <div class="mt-2">
+                                                    <button id="btnSave12" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Save !"><i class="fa fa-save"></i> Save</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <hr />
+
+                        }
+
+                        <table id="designationTable" class="table table-hover table-striped">
+                            <thead>
+                                <tr class="info">
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.MasterDesignation.Designation)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Action")
+                                    </th>
+                                </tr>
+
+                            </thead>
+                        </table>
+                        <input type="hidden" id="hiddenDesignationID" />
+
+
+                    </div>
+
+                    <div class="tab-pane fade" id="vert-tabs-communication" role="tabpanel" aria-labelledby="vert-tabs-communication-tab">
+
+                        @if ((await authorization.AuthorizeAsync(User, "CreateBasicData")).Succeeded)
+                        {
+                            <div class="row">
+                                <div class="col-6 offset-3">
+                                    <form id="saveForm9">
+                                        <div class="form-row">
+                                            <div class="form-group col-8 mb-3">
+                                                <label asp-for="CommunicationType.ComType" class="control-label"></label>
+                                                <input asp-for="CommunicationType.ComType" class="form-control" />
+                                                <span asp-validation-for="CommunicationType.ComType" class="text-danger"></span>
+                                            </div>
+                                            <div class="form-group col-4 mb-3 mt-4">
+                                                <div class="mt-2">
+                                                    <button id="btnSave9" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Save !"><i class="fa fa-save"></i> Save</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <hr />
+
+                        }
+
+                        <table id="communicationTable" class="table table-hover table-striped">
+                            <thead>
+                                <tr class="info">
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.CommunicationType.ComType)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Action")
+                                    </th>
+                                </tr>
+
+                            </thead>
+                        </table>
+                        <input type="hidden" id="hiddenCommunicationID" />
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+
+        var table2 = $('#titleTable').DataTable({
+            "ajax": '@Url.Action("TitleLoad", "BasicData")',
+            "columnDefs": [
+                    { "targets": [1], "visible": @DelClaimCheck, "width": "10" }
+            ],
+            "columns": [
+                   { "data": "Title", "autowidth": true },
+                   { "data": "EncryptTitleId", "render": function (data, type, row) {
+
+                          return '<a id="' + data + '" class="btn btn-danger btn-xs titleBtnDelete" href="#" data-toggle="tooltip" data-placement="bottom" title="Delete!"> <span class="fas fa-trash-alt"></span> </a>';
+                                 },"orderable": false
+                   }
+                ],
+            "scrollCollapse": true,
+            "autoWidth": false,
+            "processing": true,
+            "rowId": 'EncryptTitleId'
+        });
+
+        $('#titleTable').on('click', '.titleBtnDelete', function () {
+                $("#hiddenTitleID").val($(this).attr('id'));
+                $('#deleteModal2').modal('show');
+        });
+
+
+        var table5 = $('#genderTable').DataTable({
+            "ajax": '@Url.Action("GenderLoad", "BasicData")',
+            "columnDefs": [
+                    { "targets": [1], "visible": @DelClaimCheck, "width": "10" }
+            ],
+            "columns": [
+                   { "data": "Gender", "autowidth": true },
+                   { "data": "EncryptGenderId", "render": function (data, type, row) {
+
+                        return '<a id="' + data + '" class="btn btn-danger btn-xs genderBtnDelete" href="#" data-toggle="tooltip" data-placement="bottom" title="Delete!"> <span class="fas fa-trash-alt"></span> </a>';
+                                 },"orderable": false
+                   }
+                ],
+            "scrollCollapse": true,
+            "autoWidth": false,
+            "processing": true,
+            "rowId": 'EncryptGenderId'
+        });
+
+        $('#genderTable').on('click', '.genderBtnDelete', function () {
+                $("#hiddenGenderID").val($(this).attr('id'));
+                $('#deleteModal5').modal('show');
+        });
+
+        var table9 = $('#communicationTable').DataTable({
+            "ajax": '@Url.Action("ComTypesLoad", "BasicData")',
+            "columnDefs": [
+                    { "targets": [1], "visible": @DelClaimCheck, "width": "10" }
+            ],
+            "columns": [
+                   { "data": "ComType", "autowidth": true },
+                   { "data": "EncryptComType", "render": function (data, type, row) {
+
+                          return '<a id="' + data + '" class="btn btn-danger btn-xs titleBtnDelete" href="#" data-toggle="tooltip" data-placement="bottom" title="Delete!"> <span class="fas fa-trash-alt"></span> </a>';
+                                 },"orderable": false
+                   }
+                ],
+            "scrollCollapse": true,
+            "autoWidth": false,
+            "processing": true,
+            "rowId": 'EncryptComType'
+        });
+
+        $('#communicationTable').on('click', '.titleBtnDelete', function () {
+                $("#hiddenCommunicationID").val($(this).attr('id'));
+                $('#deleteModal9').modal('show');
+        });
+
+
+
+        var table12 = $('#designationTable').DataTable({
+            "ajax": '@Url.Action("DesignationLoad", "BasicData")',
+            "columnDefs": [
+                    { "targets": [1], "visible": @DelClaimCheck, "width": "10" }
+            ],
+            "columns": [
+                   { "data": "Designation", "autowidth": true },
+                   { "data": "EncryptDesignationId", "render": function (data, type, row) {
+
+                        return '<a id="' + data + '" class="btn btn-danger btn-xs designationBtnDelete" href="#" data-toggle="tooltip" data-placement="bottom" title="Delete!"> <span class="fas fa-trash-alt"></span> </a>';
+                                 },"orderable": false
+                   }
+                ],
+            "scrollCollapse": true,
+            "autoWidth": false,
+            "processing": true,
+            "rowId": 'EncryptDesignationId'
+        });
+
+        $('#designationTable').on('click', '.designationBtnDelete', function () {
+                $("#hiddenDesignationID").val($(this).attr('id'));
+                $('#deleteModal12').modal('show');
+        });
+
+
+        $("#btnSave2").click(function (e) {
+            e.preventDefault();
+
+            if (!$('#saveForm2').valid()) {
+                return false;
+            }
+            var titleObj = {
+                Title: $('#MasterTitle_Title').val(),
+            };
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: '@Url.Action("CreateTitle", "BasicData")',
+                dataType: "json",
+                data: JSON.stringify(titleObj),
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                if (response.status == "1") {
+                    $('#MasterTitle_Title').val('');
+
+                    table2.row.add({
+                        "Title": response.titleObj['Title'],
+                        "EncryptTitleId": response.titleObj['EncryptTitleId']
+                    }).draw(false);
+                    $('#countSpan2').find('span.title').text(parseInt($('#countSpan2').find('span.title').text()) + 1);
+
+                    toastr.success('Saved successfully !');
+                }
+                else if (response.status == "3") {
+                    toastr.warning('Duplicate record exists !');
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (response) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+
+        $("#btnDelete2").click(function (e) {
+            e.preventDefault();
+
+            var TitleId = $("#hiddenTitleID").val();
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: '@Url.Action("DeleteTitle", "BasicData")',
+                dataType: "json",
+                data: JSON.stringify(TitleId),
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                if (response.status == "1") {
+                    $('#deleteModal2').modal('hide');
+                    table2.row('#' + TitleId).remove().draw(false);
+                    $('#countSpan2').find('span.title').text(parseInt($('#countSpan2').find('span.title').text()) - 1);
+                    toastr.success('Deleted successfully !');
+                }
+                else if (response.status == "3") {
+                     toastr.error('Access denied as this row is used by other tables !');
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (jqXHR, textStatus) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+
+
+        $("#btnSave5").click(function (e) {
+            e.preventDefault();
+
+            if (!$('#saveForm5').valid()) {
+                return false;
+            }
+            var genderObj = {
+                Gender: $('#MasterGender_Gender').val(),
+            };
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: '@Url.Action("CreateGender", "BasicData")',
+                dataType: "json",
+                data: JSON.stringify(genderObj),
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                if (response.status == "1") {
+                    $('#MasterGender_Gender').val('');
+
+                    table5.row.add({
+                        "Gender": response.genderObj['Gender'],
+                        "EncryptGenderId": response.genderObj['EncryptGenderId']
+                    }).draw(false);
+                    $('#countSpan5').find('span.gender').text(parseInt($('#countSpan5').find('span.gender').text()) + 1);
+
+                    toastr.success('Saved successfully !');
+                }
+                else if (response.status == "3") {
+                    toastr.warning('Duplicate record exists !');
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (response) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+
+        $("#btnDelete5").click(function (e) {
+            e.preventDefault();
+
+            var GenderId = $("#hiddenGenderID").val();
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: '@Url.Action("DeleteGender", "BasicData")',
+                dataType: "json",
+                data: JSON.stringify(GenderId),
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                if (response.status == "1") {
+                    $('#deleteModal5').modal('hide');
+                    table5.row('#' + GenderId).remove().draw(false);
+                    $('#countSpan5').find('span.gender').text(parseInt($('#countSpan5').find('span.gender').text()) - 1);
+                    toastr.success('Deleted successfully !');
+                }
+                else if (response.status == "3") {
+                     toastr.error('Access denied as this row is used by other tables !');
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (jqXHR, textStatus) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+
+
+        $("#btnSave9").click(function (e) {
+            e.preventDefault();
+
+            if (!$('#saveForm9').valid()) {
+                return false;
+            }
+            var communicationObj = {
+                ComType: $('#CommunicationType_ComType').val(),
+            };
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: '@Url.Action("CreateComType", "BasicData")',
+                dataType: "json",
+                data: JSON.stringify(communicationObj),
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                if (response.status == "1") {
+                    $('#CommunicationType_ComType').val('');
+
+                    table9.row.add({
+                        "ComType": response.communicationObj['ComType'],
+                        "EncryptComType": response.communicationObj['EncryptComType']
+                    }).draw(false);
+                    $('#countSpan9').find('span.communication').text(parseInt($('#countSpan9').find('span.communication').text()) + 1);
+
+                    toastr.success('Saved successfully !');
+                }
+                else if (response.status == "3") {
+                    toastr.warning('Duplicate record exists !');
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (response) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+
+        $("#btnDelete9").click(function (e) {
+            e.preventDefault();
+
+            var CommunicationId = $("#hiddenCommunicationID").val();
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: '@Url.Action("DeleteComType", "BasicData")',
+                dataType: "json",
+                data: JSON.stringify(CommunicationId),
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                if (response.status == "1") {
+                    $('#deleteModal9').modal('hide');
+                    table9.row('#' + CommunicationId).remove().draw(false);
+                    $('#countSpan9').find('span.communication').text(parseInt($('#countSpan9').find('span.communication').text()) - 1);
+                    toastr.success('Deleted successfully !');
+                }
+                else if (response.status == "3") {
+                     toastr.error('Access denied as this row is used by other tables !');
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (jqXHR, textStatus) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+
+
+        $("#btnSave12").click(function (e) {
+            e.preventDefault();
+
+            if (!$('#saveForm12').valid()) {
+                return false;
+            }
+            var designationObj = {
+                Designation: $('#MasterDesignation_Designation').val(),
+            };
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: '@Url.Action("CreateDesignation", "BasicData")',
+                dataType: "json",
+                data: JSON.stringify(designationObj),
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                if (response.status == "1") {
+                    $('#MasterDesignation_Designation').val('');
+
+                    table12.row.add({
+                        "Designation": response.designationObj['Designation'],
+                        "EncryptDesignationId": response.designationObj['EncryptDesignationId']
+                    }).draw(false);
+                    $('#countSpan12').find('span.designation').text(parseInt($('#countSpan12').find('span.designation').text()) + 1);
+
+                    toastr.success('Saved successfully !');
+                }
+                else if (response.status == "3") {
+                    toastr.warning('Duplicate record exists !');
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (response) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+
+        $("#btnDelete12").click(function (e) {
+            e.preventDefault();
+
+            var DesignationId = $("#hiddenDesignationID").val();
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: '@Url.Action("DeleteDesignation", "BasicData")',
+                dataType: "json",
+                data: JSON.stringify(DesignationId),
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                if (response.status == "1") {
+                    $('#deleteModal12').modal('hide');
+                    table12.row('#' + DesignationId).remove().draw(false);
+                    $('#countSpan12').find('span.designation').text(parseInt($('#countSpan12').find('span.designation').text()) - 1);
+                    toastr.success('Deleted successfully !');
+                }
+                else if (response.status == "3") {
+                     toastr.error('Access denied as this row is used by other tables !');
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (jqXHR, textStatus) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+
+    });
+
+</script>

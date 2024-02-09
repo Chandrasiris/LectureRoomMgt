@@ -1,0 +1,103 @@
+﻿@model LectureRoomMgt.Models.ViewModels.UserViewModel;
+@inject IAuthorizationService authorization
+@{
+    ViewBag.Title = "My account";
+    ViewBag.View = "My account";
+}
+
+@Html.AntiForgeryToken()
+@if ((await authorization.AuthorizeAsync(User, "StaffOnly")).Succeeded)
+{
+    <div class="row">
+        <div class="col-4 offset-4">
+            <form id="saveForm">
+                <div class="form-row">
+                    <div class="form-group col-9 mb-3">
+                        <label asp-for="Username" class="control-label"></label>
+                        <input asp-for="Username" class="form-control" value="@User.Identity.Name" disabled />
+                        <span asp-validation-for="Username" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-9 mb-3">
+                        <label asp-for="Password" class="control-label"></label>
+                        <input asp-for="Password" class="form-control" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-9 mb-3">
+                        <label asp-for="NewPassword" class="control-label"></label>
+                        <input asp-for="NewPassword" class="form-control" />
+                        <span asp-validation-for="NewPassword" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-3 mb-3 mt-4">
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-info btn-sm" data-container="body" data-toggle="popover" data-placement="right" data-content="<ul><li>Passwords must be at least 6 characters.</li><li>Passwords must have at least one non alphanumeric character.</li><li>Passwords must have at least one digit ('0'-'9').</li><li>Passwords must have at least one uppercase ('A'-'Z').</li></ul>"><i class="fas fa-info-circle"></i> Info</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-9 mb-3">
+                        <label asp-for="ConfirmNewPassword" class="control-label"></label>
+                        <input asp-for="ConfirmNewPassword" class="form-control" />
+                        <span asp-validation-for="ConfirmNewPassword" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-3 mb-3 mt-4">
+                        <div class="mt-2">
+                            <button id="btnSave" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Save !"><i class="fa fa-save"></i> Save</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+<script>
+   $(document).ready(function () {
+
+        $(function () {
+            $('[data-toggle="popover"]').popover({
+                html: true
+            });
+        });
+
+        $("#btnSave").click(function (e) {
+            e.preventDefault();
+
+            if (!$('#saveForm').valid()) {
+                return false;
+            }
+            var UserObj = {
+                Password: $('#Password').val(),
+                NewPassword: $('#NewPassword').val(),
+            };
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: '@Url.Action("IndexAccount", "Staff")',
+                dataType: "json",
+                data: JSON.stringify(UserObj),
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                if (response.status == "1") {
+                    toastr.success('Updated successfuly !');
+                    setTimeout(function () {
+                        location.reload(true);
+                      }, 1000);
+                }
+                else if (response.status == "3") {
+                    toastr.error(response.message);
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (response) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+   });
+</script>

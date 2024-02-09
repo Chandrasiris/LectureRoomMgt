@@ -1,0 +1,620 @@
+﻿@model LectureRoomMgt.Models.TempLogin;
+@inject IAuthorizationService authorization
+@{
+    ViewBag.Title = "Login Profiles";
+    ViewBag.View = "Login Profiles";
+
+    var RejectClaimCheck = (await authorization.AuthorizeAsync(User, "RejectLoginProfiles")).Succeeded ? "true" : "false";
+}
+
+<link href="~/lib/bootstrap-toggle/css/bootstrap-toggle.min.css" rel="stylesheet" />
+
+<style>
+    div.scroll {
+        overflow: auto;
+    }
+</style>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Are you sure?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="myModalBody">
+                <p>Do you really want to reject the profile ?<br /> <b>This process cannot be undone</b>.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger btn-sm" id="btnDelete">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.AntiForgeryToken()
+
+@if ((await authorization.AuthorizeAsync(User, "CreateLoginProfiles")).Succeeded)
+{
+    <div class="card-footer" style="text-align:center">
+        <a asp-controller="Admin" asp-action="IndexTempLoginCreate" class="btn btn-info" data-toggle="tooltip" data-placement="bottom" title="Create login !"><i class="fas fa-plus-square"></i> Create Login</a>
+    </div>
+    <br />
+}
+
+
+<div class="accordion" id="accordionExample">
+    <div class="card">
+        <div class="card-header" id="headingFour">
+            <div data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                <label><i class="fas fa-user-shield"></i>&nbsp Staff Profiles<sup><span class="badge badge-success" style="font-size:small" id="StaffCount">@ViewBag.StaffCount</span></sup></label>
+            </div>
+        </div>
+        <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordionExample">
+            <div class="card-body">
+                <div class="scroll">
+                    <table id="StaffTable" class="table table-hover table-striped">
+                        <thead>
+                            <tr class="info">
+                                <th>
+                                    @Html.DisplayNameFor(model => model.User)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.RegisteredDate)
+                                </th>
+                            </tr>
+
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header" id="headingOne">
+            <div data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                <label><i class="fas fa-user-alt"></i>&nbsp Registered Profiles<sup><span class="badge badge-success" style="font-size:small" id="RegisteredCount">@ViewBag.RegisteredCount</span></sup></label>
+            </div>
+        </div>
+        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+            <div class="card-body">
+                <div class="scroll">
+                    <table id="registeredTable" class="table table-hover table-striped">
+                        <thead>
+                            <tr class="info">
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Name)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.NIC)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Tel)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.UserType)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.IsExternal)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.User)
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Action")
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            @if ((await authorization.AuthorizeAsync(User, "DeactivateLoginProfiles")).Succeeded)
+            {
+                <div class="card-footer" style="text-align:center">
+                    <button id="btnDeactivate" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Save !"><i class="fa fa-save"></i> Save</button>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header" id="headingFive">
+            <div data-toggle="collapse" data-target="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
+                <label><i class="fas fa-user-check"></i>&nbsp Approved Profiles<sup><span class="badge badge-warning" style="font-size:small" id="PendingCount">@ViewBag.ApprovedCount</span></sup></label>
+            </div>
+        </div>
+        <div id="collapseFive" class="collapse" aria-labelledby="headingFive" data-parent="#accordionExample">
+            <div class="card-body">
+                <div class="scroll">
+                    <table id="approvedTable" class="table table-hover table-striped">
+                        <thead>
+                            <tr class="info">
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Name)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.NIC)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Tel)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.UserType)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.IsExternal)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.User)
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Action")
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            @if ((await authorization.AuthorizeAsync(User, "DissaproveLoginProfiles")).Succeeded)
+            {
+                <div class="card-footer" style="text-align:center">
+                    <button id="btnDissapprove" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Save !"><i class="fa fa-save"></i> Save</button>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header" id="headingTwo">
+            <div data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                <label><i class="fas fa-user-clock"></i>&nbsp Pending Profiles<sup id="pendingCount"><span class="badge badge-info pending" style="font-size:small">@ViewBag.PendingCount</span></sup></label>
+            </div>
+        </div>
+        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+            <div class="card-body">
+                <div class="scroll">
+                    <table id="pendingTable" class="table table-hover table-striped" width="100%">
+                        <thead>
+                            <tr class="info">
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Email)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.NIC)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Tel)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.UserType)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.IsExternal)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.User)
+                                </th>
+                                <th>
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Reject")
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            @if ((await authorization.AuthorizeAsync(User, "ApproveLoginProfiles")).Succeeded)
+            {
+                <div class="card-footer" style="text-align:center">
+                    <button id="btnApprove" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Save !"><i class="fa fa-save"></i> Save</button>
+                </div>
+
+            }
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header" id="headingThree">
+            <div data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                <label><i class="fas fa-user-alt-slash"></i>&nbsp Deactivated Profiles<sup><span class="badge badge-danger" style="font-size:small" id="DeactivatedCount">@ViewBag.DeactivatedCount</span></sup></label>
+            </div>
+        </div>
+        <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
+            <div class="card-body">
+                <div class="scroll">
+                    <table id="DeactivatedTable" class="table table-hover table-striped">
+                        <thead>
+                            <tr class="info">
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Name)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.NIC)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Tel)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.UserType)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.IsExternal)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.User)
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <input type="hidden" id="hiddenAccessCode" />
+</div>
+
+<script src="~/lib/bootstrap-toggle/js/bootstrap-toggle.min.js"></script>
+<script>
+    $(document).ready(function () {
+
+        $('#StaffTable').DataTable({
+             "ajax": '@Url.Action("StaffLoad", "Admin")',
+              "columns": [
+                   { "data": "User", "autowidth": true },
+                   { "data": "StringDate", "autowidth": true }
+              ],
+              "scrollCollapse": true,
+              "autoWidth": true,
+              "bPaginate": false,
+              "bInfo": false,
+              "processing": true,
+              "rowId": 'EncryptAccessCode'
+        });
+        $('#registeredTable').DataTable({
+                "ajax": '@Url.Action("RegisteredLoad", "Admin")',
+                "columns": [
+                    { "data": "Name", "autowidth": true },
+                    { "data": "NIC", "autowidth": true },
+                    { "data": "Tel", "autowidth": true },
+                    { "data": "UserType", "render": function (data, type, row){
+                          if (data == "I") {
+                              return '<label class="badge badge-primary" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">Staff</label>';
+                          }
+                          else if (data == "L") {
+                              return '<label class="badge badge-warning" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">Lecturer</label>';
+                          }
+                          else if (data == "A") {
+                              return '<label class="badge badge-dark" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">Staff-Assistant</label>';
+                          }
+                          else if (data == "S") {
+                              return '<label class="badge badge-success" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">Student</label>';
+                          }
+                        }
+                    },
+                    { "data": "IsExternal", "render": function (data, type, row){
+                          if (data) {
+                              return '<label class="badge badge-secondary" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">External</label>';
+                          }
+                          else {
+                              return '<label class="badge badge-success" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">Internal</label>';
+                          }
+                            }
+                        },
+                    { "data": "User", "autowidth": true },
+                    { "data": "IsSelectedRegistered", "render": function (data, type, row) {
+                        return '<input type="checkbox" class="registeredToggle" data-width="100" data-height="25" data-toggle="toggle" data-size="mini" data-on="Deactivated" data-off="Deactivate" data-onstyle="danger" data-offstyle="default">';
+                          }
+                    }
+                ],
+                "fnDrawCallback": function() {
+                    $('.registeredToggle').bootstrapToggle();
+                },
+                "scrollCollapse": true,
+                "autoWidth": true,
+                "bPaginate": false,
+                "bInfo": false,
+                "processing": true,
+                "rowId": 'EncryptAccessCode'
+        });
+        $('#approvedTable').DataTable({
+                "ajax": '@Url.Action("ApprovedLoad", "Admin")',
+                "columns": [
+                    { "data": "Name", "autowidth": true },
+                    { "data": "NIC", "autowidth": true },
+                    { "data": "Tel", "autowidth": true },
+                    { "data": "UserType", "render": function (data, type, row){
+                          if (data == "I") {
+                              return '<label class="badge badge-primary" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">Staff</label>';
+                          }
+                          else if (data == "L") {
+                              return '<label class="badge badge-warning" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">Lecturer</label>';
+                          }
+                          else if (data == "A") {
+                              return '<label class="badge badge-dark" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">Staff-Assistant</label>';
+                          }
+                          else if (data == "S") {
+                              return '<label class="badge badge-success" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">Student</label>';
+                          }
+                        }
+                    },
+                    { "data": "IsExternal", "render": function (data, type, row){
+                          if (data) {
+                              return '<label class="badge badge-secondary" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">External</label>';
+                          }
+                          else {
+                              return '<label class="badge badge-success" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">Internal</label>';
+                          }
+                            }
+                        },
+                    { "data": "User", "autowidth": true },
+                    { "data": "IsSelectedApproved", "render": function (data, type, row) {
+                        return '<input type="checkbox" class="approvedToggle" data-width="100" data-height="25" data-toggle="toggle" data-size="mini" data-on="Dissapproved" data-off="Dissapprove" data-onstyle="danger" data-offstyle="default">';
+                          }
+                    }
+                ],
+                "fnDrawCallback": function() {
+                    $('.approvedToggle').bootstrapToggle();
+                },
+                "scrollCollapse": true,
+                "autoWidth": true,
+                "bPaginate": false,
+                "bInfo": false,
+                "processing": true,
+                "rowId": 'EncryptAccessCode'
+        });
+        var table = $('#pendingTable').DataTable({
+            "ajax": '@Url.Action("PendingLoad", "Admin")',
+                "columnDefs": [
+                    { "targets": [7], "visible": @RejectClaimCheck, "width": "10px" }
+                ],
+                "columns": [
+                    { "data": "Email", "autowidth": true },
+                    { "data": "NIC", "autowidth": true },
+                    { "data": "Tel", "autowidth": true },
+                    { "data": "UserType", "render": function (data, type, row){
+                          if (data == "I") {
+                              return '<label class="badge badge-primary" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">Staff</label>';
+                          }
+                          else if (data == "L") {
+                              return '<label class="badge badge-warning" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">Lecturer</label>';
+                          }
+                          else if (data == "A") {
+                              return '<label class="badge badge-dark" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">Staff-Assistant</label>';
+                          }
+                          else if (data == "S") {
+                              return '<label class="badge badge-success" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">Student</label>';
+                          }
+                        }
+                    },
+                    { "data": "IsExternal", "render": function (data, type, row){
+                          if (data) {
+                              return '<label class="badge badge-secondary" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">External</label>';
+                          }
+                          else {
+                              return '<label class="badge badge-success" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">Internal</label>';
+                          }
+                            }
+                        },
+                    { "data": "User", "autowidth": true },
+                    { "data": "IsSelectedPending", "render": function (data, type, row) {
+                        return '<input type="checkbox" class="pendingToggle" asp-for="IsSelectedPending" data-width="75" data-height="25" data-toggle="toggle" data-size="mini" data-on="Approved" data-off="Approve" data-onstyle="success" data-offstyle="default">';
+                          }
+                    },
+                    { "data": "EncryptAccessCode", "render": function (data, type, row) {
+                        return '<a id="' + data + '" class="btn btn-danger btn-xs tblBtnReject" href="#" data-toggle="tooltip" data-placement="bottom" title="Reject!"> <span class="fas fa-trash-alt"></span> </a>';
+                        },"orderable": false
+                    }
+                ],
+                "fnDrawCallback": function() {
+                    $('.pendingToggle').bootstrapToggle();
+                },
+                "scrollCollapse": true,
+                "autoWidth": true,
+                "bPaginate": false,
+                "bInfo": false,
+                "processing": true,
+                "rowId": 'EncryptAccessCode'
+        });
+
+
+        $('#infoTable').on('click', '.tblBtnReject', function () {
+            $("#hiddenAccessCode").val($(this).attr('id'));
+            $('#deleteModal').modal('show');
+        });
+
+
+        $('#DeactivatedTable').DataTable({
+                "ajax": '@Url.Action("DeactivatedLoad", "Admin")',
+                "columns": [
+                    { "data": "Name", "autowidth": true },
+                    { "data": "NIC", "autowidth": true },
+                    { "data": "Tel", "autowidth": true },
+                    { "data": "UserType", "render": function (data, type, row){
+                          if (data == "I") {
+                              return '<label class="badge badge-primary" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">Staff</label>';
+                          }
+                          else if (data == "L") {
+                              return '<label class="badge badge-warning" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">Lecturer</label>';
+                          }
+                          else if (data == "A") {
+                              return '<label class="badge badge-dark" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">Staff-Assistant</label>';
+                          }
+                          else if (data == "S") {
+                              return '<label class="badge badge-success" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">Student</label>';
+                          }
+                        }
+                    },
+                    { "data": "IsExternal", "render": function (data, type, row){
+                          if (data) {
+                              return '<label class="badge badge-secondary" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">External</label>';
+                          }
+                          else {
+                              return '<label class="badge badge-success" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">Internal</label>';
+                          }
+                            }
+                        },
+                    { "data": "User", "autowidth": true }
+                ],
+                "scrollCollapse": true,
+                "autoWidth": true,
+                "bPaginate": false,
+                "bInfo": false,
+                "processing": true,
+                "rowId": 'EncryptAccessCode'
+        });
+
+        $("#btnDeactivate").click(function (e) {
+            e.preventDefault();
+
+            var listRegister = [];
+            $('#registeredTable tbody').find('tr').each(function () {
+                var row = $(this);
+                if (row.find('input[type="checkbox"]').is(':checked')) {
+
+                    var listItem = {
+                        AccessCode: $(this).attr('id')
+                    }
+                    listRegister.push(listItem);
+                }
+            });
+
+            var tempLogins = {
+                loginsDeactivate : listRegister,
+            };
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("DeactivateProfiles", "Admin")',
+                data: tempLogins,
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                if (response.status == "1") {
+                    toastr.success('Profiles deactivated !');
+                    setTimeout(function () {
+                        location.reload(true);
+                      }, 1000);
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (response) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+
+        $("#btnApprove").click(function (e) {
+            e.preventDefault();
+
+            debugger;
+
+
+            var listPending = [];
+            $('#pendingTable tbody').find('tr').each(function () {
+                var row = $(this);
+                if (row.find('input[type="checkbox"]').is(':checked')) {
+
+                    var listItem = {
+                        AccessCode: $(this).attr('id')
+                    }
+                    listPending.push(listItem);
+                }
+            });
+
+            var tempLogins = {
+                loginsApprove : listPending,
+            };
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("ApproveProfiles", "Admin")',
+                data: tempLogins,
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                if (response.status == "1") {
+                    toastr.success('Profiles approved !');
+                    setTimeout(function () {
+                        location.reload(true);
+                      }, 1000);
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (response) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+
+        $("#btnDissapprove").click(function (e) {
+            e.preventDefault();
+
+            var listApproved = [];
+            $('#approvedTable tbody').find('tr').each(function () {
+                var row = $(this);
+                if (row.find('input[type="checkbox"]').is(':checked')) {
+
+                    var listItem = {
+                        AccessCode: $(this).attr('id')
+                    }
+                    listApproved.push(listItem);
+                }
+            });
+
+            var tempLogins = {
+                loginsDissapprove : listApproved,
+            };
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("DissapproveProfiles", "Admin")',
+                data: tempLogins,
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                if (response.status == "1") {
+                    toastr.success('Profiles rejected !');
+                    setTimeout(function () {
+                        location.reload(true);
+                      }, 1000);
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (response) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+
+        $("#btnDelete").click(function (e) {
+            e.preventDefault();
+
+            var AccessCode = $("#hiddenAccessCode").val();
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: '@Url.Action("RejectProfile", "Admin")',
+                dataType: "json",
+                data: JSON.stringify(AccessCode),
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                if (response.status == "1") {
+                    $('#deleteModal').modal('hide');
+                    table.row('#' + AccessCode).remove().draw(false);
+
+                    $('#pendingCount').find('span.pending').text(parseInt($('#pendingCount').find('span.pending').text()) - 1);
+                    toastr.success('Profile rejected !');
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (jqXHR, textStatus) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+    });
+
+</script>

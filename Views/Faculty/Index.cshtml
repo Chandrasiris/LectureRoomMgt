@@ -1,0 +1,66 @@
+﻿@model LectureRoomMgt.Models.Reservation.Faculty
+@using Kendo.Mvc.UI
+<link href="~/Theme2/pace.min.css" rel="stylesheet" />
+<link href="~/Theme2/bootstrap-extended.css" rel="stylesheet" />
+<link href="~/Theme2/bootstrap.min.css" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<link href="~/Theme2/app.css" rel="stylesheet" />
+<link href="~/Theme2/icons.css" rel="stylesheet" />
+<link href="~/custom/css/kendo.bootstrap-v4.min.css" rel="stylesheet" />
+<script src="~/custom/js/kendo.all.min.js"></script>
+<script src="~/custom/js/kendo.aspnetmvc.min.js"></script>
+
+<div class="card border-top border-0 border-4 border-info">
+    <div class="card-body">
+        <div class="border p-4 rounded">
+            <div class="card-title d-flex align-items-center">
+                <div>
+                    <i class="bx bxs-home me-1 font-22 text-info"></i>
+                </div>
+                <h5 class="mb-0 text-info">Create Faculty</h5>
+            </div><br />
+            <hr />          
+            @(Html.Kendo().Grid<LectureRoomMgt.Models.Reservation.Faculty>()
+                .Name("grid")
+                .Columns(columns =>
+                {
+                    columns.Bound(p => p.Code).Width(100);
+                    columns.Bound(p => p.FacultyName);
+                    columns.Command(command => { command.Edit(); command.Destroy(); }).Width(200);
+                })
+                .ToolBar(toolbar => toolbar.Create().Text("Add New Faculty"))
+                .Editable(editable => editable.Mode(GridEditMode.PopUp))
+                .Pageable()
+                .Sortable()
+                .Scrollable()
+                .HtmlAttributes(new { style = "height:430px;" })
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .PageSize(20)
+                    .Events(events => events.Error("error_handler"))
+                    .Model(model => model.Id(p => p.Id))
+                    .Create(update => update.Action("Create", "Faculty"))
+                    .Read(read => read.Action("Read", "Faculty"))
+                   .Update(update => update.Action("Update", "Faculty"))
+                   .Destroy(update => update.Action("Delete", "Faculty"))
+                )
+            )
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+</script>

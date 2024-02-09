@@ -1,0 +1,104 @@
+﻿@model LectureRoomMgt.Models.Reservation.FloorVM
+@{
+    ViewBag.Title = "Block-Floors";
+
+}
+
+@Html.AntiForgeryToken()
+<div class="row">
+    <div class="col-12">
+        <form id="saveForm">
+
+            <div class="form-row mb-2">
+                <div class="card-footer col-12" style="text-align:center">
+                    <div class="form-row">
+                        <div class="form-group col-6 offset-3">
+                            <label asp-for="FacultyId" class="form-label"></label><br />
+                            <select asp-for="FacultyId" asp-items="@ViewBag.Faculties as SelectList" class="form-control col-12">
+                                <option value="">Please select</option>
+                            </select>
+                            <span asp-validation-for="FacultyId" class="text-danger"></span>
+                        </div>
+
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-6 offset-3">
+                            <label asp-for="BlockId" class="form-label"></label><br />
+                            <select asp-for="BlockId" class="form-control col-12">
+                            </select>
+
+                            <span asp-validation-for="BlockId" class="text-danger"></span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-4 offset-4" style="text-align:center">
+                <div class="form-group">
+                    <button class="btn btn-block btn-outline-info btn-lg btnView" id="F">
+                        <i class="fas fa-warehouse"></i> Floors
+                    </button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        $('#FacultyId').change(function () {
+            event.preventDefault();
+
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetBlocksByFac", "Floors")',
+                contentType: "application/json; charset=utf-8",
+                data: { facId: $('#FacultyId :selected').val() },
+                datatype: "json",
+            }).done(function (response) {
+
+                $("#BlockId").empty();
+                $("#BlockId").append("<option value = ''>Please select</option>");
+                $.each(response, function (index, row) {
+                    $("#BlockId").append("<option value = '" + row.Id + "'>" + row.Name + "</option>");
+                });
+            });
+        });
+
+
+        $(".btnView").click(function (e) {
+            e.preventDefault();
+
+            if (!$('#saveForm').valid()) {
+                return false;
+            }
+
+            var floorVM = {
+                FacultyId: $('#FacultyId :selected').val(),
+                BlockId: $('#BlockId :selected').val(),
+                CallType: $(this).attr('id')
+            };
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("FloorIndex", "Floors")',
+                data: floorVM,
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+
+            }).done(function (response) {
+                if (response.status == "1") {
+                    window.location.replace(response.redirectUrl);
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (response) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+
+  });
+</script>

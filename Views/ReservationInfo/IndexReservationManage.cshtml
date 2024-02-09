@@ -1,0 +1,386 @@
+﻿@model LectureRoomMgt.Models.Reservation.ReservationInfoVM
+@{
+    ViewBag.Title = "Manage Reservations";
+    ViewBag.View = "Manage Reservations";
+}
+
+<link href="~/lib/bootstrap-toggle/css/bootstrap-toggle.min.css" rel="stylesheet" />
+
+<style>
+    div.scroll {
+        overflow: auto;
+    }
+</style>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Are you sure?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="myModalBody">
+                <p>Do you really want to cancel the booking ?<br /> <b>This process cannot be undone</b>.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger btn-sm" id="btnDelete">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@Html.AntiForgeryToken()
+
+
+<div class="accordion" id="accordionExample">
+    <div class="card">
+        <div class="card-header" id="headingOne">
+            <div data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                <label><i class="fas fa-check-circle"></i>&nbsp Completed<sup><span class="badge badge-success" style="font-size:small" id="PendingCount">@ViewBag.CompletedCount</span></sup></label>
+            </div>
+        </div>
+        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+            <div class="card-body">
+                <div class="scroll">
+                    <table id="completedTable" class="table table-hover table-striped">
+                        <thead>
+                            <tr class="info">
+                                <th>
+                                    @Html.DisplayNameFor(model => model.FacultyName)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.BlockName)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.FloorName)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.RoomName)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Title)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.StartEndDate)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.CourseName)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.LecName)
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Action")
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer" style="text-align:center">
+                <button id="btnCancel" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Save !"><i class="fa fa-save"></i> Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header" id="headingTwo">
+            <div data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                <label><i class="fas fa-arrow-circle-up"></i>&nbsp Pending Profiles<sup id="OngoingCount"><span class="badge badge-info ongoing" style="font-size:small">@ViewBag.OngoingCount</span></sup></label>
+
+            </div>
+        </div>
+        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+            <div class="card-body">
+                <div class="scroll">
+                    <table id="ongoingTable" class="table table-hover table-striped">
+                        <thead>
+                            <tr class="info">
+                                <th>
+                                    @Html.DisplayNameFor(model => model.FacultyName)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.BlockName)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.FloorName)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.RoomName)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Title)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.StartEndDate)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.CourseName)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.LecName)
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Action")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Cancel")
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer" style="text-align:center">
+                <button id="btnComplete" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Complete !"><i class="fa fa-save"></i> Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header" id="headingThree">
+            <div data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                <label><i class="fas fa-ban"></i>&nbsp Cancelled<sup><span class="badge badge-danger" style="font-size:small" id="CancelCount">@ViewBag.CancelledCount</span></sup></label>
+            </div>
+        </div>
+        <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
+            <div class="card-body">
+                <div class="scroll">
+                    <table id="cancelledTable" class="table table-hover table-striped">
+                        <thead>
+                            <tr class="info">
+                                <th>
+                                    @Html.DisplayNameFor(model => model.FacultyName)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.BlockName)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.FloorName)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.RoomName)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Title)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.StartEndDate)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.CourseName)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.LecName)
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <input type="hidden" id="hiddenAccessCode" />
+</div>
+
+<script src="~/lib/bootstrap-toggle/js/bootstrap-toggle.min.js"></script>
+<script>
+    $(document).ready(function () {
+
+        $('#completedTable').DataTable({
+                "ajax": '@Url.Action("CompletedLoad", "ReservationInfo")',
+                "columns": [
+                    { "data": "FacultyName", "autowidth": true },
+                    { "data": "BlockName", "autowidth": true },
+                    { "data": "FloorName", "autowidth": true },
+                    { "data": "RoomName", "autowidth": true },
+                    { "data": "Title", "autowidth": true },
+                    { "data": "StartEndDate", "autowidth": true },
+                    { "data": "CourseName", "autowidth": true },
+                    { "data": "LecName", "autowidth": true },
+                    { "data": "IsSelectedCancelled", "render": function (data, type, row) {
+                        return '<input type="checkbox" class="cancelToggle" data-width="100" data-height="25" data-toggle="toggle" data-size="mini" data-on="Cancelled" data-off="Cancel" data-onstyle="danger" data-offstyle="default">';
+                          }
+                    }
+                ],
+                "fnDrawCallback": function() {
+                    $('.cancelToggle').bootstrapToggle();
+                },
+                "scrollCollapse": true,
+                "autoWidth": true,
+                "bPaginate": false,
+                "bInfo": false,
+                "processing": true,
+                "rowId": 'EncryptCode'
+        });
+
+        var table = $('#ongoingTable').DataTable({
+                        "ajax": '@Url.Action("OngoingLoad", "ReservationInfo")',
+                        "columns": [
+                            { "data": "FacultyName", "autowidth": true },
+                            { "data": "BlockName", "autowidth": true },
+                            { "data": "FloorName", "autowidth": true },
+                            { "data": "RoomName", "autowidth": true },
+                            { "data": "Title", "autowidth": true },
+                            { "data": "StartEndDate", "autowidth": true },
+                            { "data": "CourseName", "autowidth": true },
+                            { "data": "LecName", "autowidth": true },
+                            { "data": "IsSelectedApproved", "render": function (data, type, row) {
+                                return '<input type="checkbox" class="completedToggle" data-width="100" data-height="25" data-toggle="toggle" data-size="mini" data-on="Completed" data-off="Complete" data-onstyle="success" data-offstyle="default">';
+                                  }
+                            },
+                            { "data": "EncryptCode", "render": function (data, type, row) {
+                                return '<a id="' + data + '" class="btn btn-danger btn-xs tblBtnReject" href="#" data-toggle="tooltip" data-placement="bottom" title="Cancel !"> <span class="fas fa-ban"></span> </a>';
+                                },"orderable": false
+                            }
+
+                        ],
+                        "fnDrawCallback": function() {
+                            $('.completedToggle').bootstrapToggle();
+                        },
+                        "scrollCollapse": true,
+                        "autoWidth": true,
+                        "bPaginate": false,
+                        "bInfo": false,
+                        "processing": true,
+                        "rowId": 'EncryptCode'
+                    });
+
+        $('#cancelledTable').DataTable({
+                "ajax": '@Url.Action("CancelledLoad", "ReservationInfo")',
+                "columns": [
+                    { "data": "FacultyName", "autowidth": true },
+                    { "data": "BlockName", "autowidth": true },
+                    { "data": "FloorName", "autowidth": true },
+                    { "data": "RoomName", "autowidth": true },
+                    { "data": "Title", "autowidth": true },
+                    { "data": "StartEndDate", "autowidth": true },
+                    { "data": "CourseName", "autowidth": true },
+                    { "data": "LecName", "autowidth": true },
+                ],
+                "scrollCollapse": true,
+                "autoWidth": true,
+                "bPaginate": false,
+                "bInfo": false,
+                "processing": true,
+        });
+
+
+        $('#ongoingTable').on('click', '.tblBtnReject', function () {
+            $("#hiddenAccessCode").val($(this).attr('id'));
+            $('#deleteModal').modal('show');
+        });
+
+        $("#btnCancel").click(function (e) {
+            e.preventDefault();
+
+            var  listCancelled = [];
+            $('#completedTable tbody').find('tr').each(function () {
+                var row = $(this);
+                if (row.find('input[type="checkbox"]').is(':checked')) {
+
+                    var listItem = {
+                        EncryptCode: $(this).attr('id')
+                    }
+                    listCancelled.push(listItem);
+                }
+            });
+
+            var bookings = {
+                cancelledList : listCancelled,
+            };
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("CancelBookingBulk", "ReservationInfo")',
+                data: bookings,
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                if (response.status == "1") {
+                    toastr.success('Bookings cancelled !');
+                    setTimeout(function () {
+                        location.reload(true);
+                      }, 1000);
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (response) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+
+        $("#btnComplete").click(function (e) {
+            e.preventDefault();
+
+            var listCompleted = [];
+            $('#ongoingTable tbody').find('tr').each(function () {
+                var row = $(this);
+                if (row.find('input[type="checkbox"]').is(':checked')) {
+
+                    var listItem = {
+                        EncryptCode: $(this).attr('id')
+                    }
+                    listCompleted.push(listItem);
+                }
+            });
+
+            var bookings = {
+                completedList : listCompleted,
+            };
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("CompleteBooking", "ReservationInfo")',
+                data: bookings,
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                if (response.status == "1") {
+                    toastr.success('Bookings completed !');
+                    setTimeout(function () {
+                        location.reload(true);
+                      }, 1000);
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (response) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+
+        $("#btnDelete").click(function (e) {
+            e.preventDefault();
+
+            var EncryptCode = $("#hiddenAccessCode").val();
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: '@Url.Action("CancelBooking", "ReservationInfo")',
+                dataType: "json",
+                data: JSON.stringify(EncryptCode),
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                if (response.status == "1") {
+                    $('#deleteModal').modal('hide');
+                    table.row('#' + EncryptCode).remove().draw(false);
+
+                    $('#OngoingCount').find('span.ongoing').text(parseInt($('#OngoingCount').find('span.ongoing').text()) - 1);
+                    toastr.success('Booking cancelled !');
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (jqXHR, textStatus) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+    });
+
+</script>

@@ -1,0 +1,342 @@
+﻿@using LectureRoomMgt.Models.Reservation
+@model IEnumerable<LectureRoomMgt.Models.Reservation.RoomVM>
+@using Kendo.Mvc.UI
+
+<link href="~/custom/css/kendo.bootstrap-main.css" rel="stylesheet" />
+<script src="~/custom/js/jszip.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_jquery.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.all.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.aspnetmvc.min.js"></script>
+
+
+<style>
+    .k-grid tbody tr {
+        line-height: 14px;
+    }
+
+    .k-grid tbody td {
+        padding: 5px;
+    }
+
+    .k-grid-save-changes:hover {
+        background-color: #5cb85c;
+    }
+
+    .k-grid-delete-custom {
+        background-color: tomato;
+    }
+
+    .k-grid-cancel-changes:hover {
+        background-color: red;
+    }
+
+    .k-grid-excel:hover {
+        background-color: forestgreen;
+    }
+
+    .k-grid-pdf:hover {
+        background-color: red;
+    }
+
+    .k-grid .k-grid-toolbar .k-grid-add,
+    .k-grid .k-grid-toolbar .k-grid-save-changes,
+    .k-grid .k-grid-toolbar .k-grid-cancel-changes,
+    .k-grid .k-grid-toolbar .k-grid-delete-custom {
+        min-width: 0;
+    }
+
+        .k-grid .k-grid-toolbar .k-grid-add .k-icon,
+        .k-grid .k-grid-toolbar .k-grid-save-changes .k-icon,
+        .k-grid .k-grid-toolbar .k-grid-cancel-changes .k-icon,
+        .k-grid .k-grid-toolbar .k-grid-delete-custom .k-icon {
+            margin: 0;
+        }
+</style>
+
+
+<div class="row">
+    <div class="col-12">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-landmark"></i>
+                Create Room
+            </h3>
+        </div>
+
+        <form>
+            <div class="card-footer col-12">
+                <div class="form-row">
+
+                    <div class="form-group col-6 offset-3">
+                        <label class="form-label">Faculty</label><br />
+                        @(Html.Kendo().DropDownList()
+                            .Name("FacultyId")
+                            .HtmlAttributes(new { style = "width:100%" })
+                            .OptionLabel("Select Faculty")
+                            .DataTextField("FacultyName")
+                            .DataValueField("Id")
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetFaculties", "Room");
+                                });
+                            })
+                        )
+                    </div>
+
+                    <div class="form-group col-6 offset-3">
+                        <label class="form-label">Block</label><br />
+                        @(Html.Kendo().DropDownList()
+                            .Name("BlockId")
+                            .HtmlAttributes(new { style = "width:100%" })
+                            .OptionLabel("Select Block")
+                            .DataTextField("BlockName")
+                            .DataValueField("Id")
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetBlocks", "Room").Data("filterBlocks");
+                                })
+                                .ServerFiltering(true);
+                            })
+                            .Enable(false)
+                            .AutoBind(false)
+                            .CascadeFrom("FacultyId")
+                        )
+                    </div>
+
+                    <div class="form-group col-6 offset-3">
+                        <label class="form-label">Floor</label><br />
+                        @(Html.Kendo().DropDownList()
+                            .Name("FloorId")
+                            .HtmlAttributes(new { style = "width:100%" })
+                            .OptionLabel("Select Floor")
+                            .DataTextField("FloorName")
+                            .DataValueField("Id")
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetFloors", "Room").Data("filterFloors");
+                                })
+                                .ServerFiltering(true);
+                            })
+                            .Enable(false)
+                            .AutoBind(false)
+                            .CascadeFrom("BlockId")
+                        )
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="card-footer col-12" style="text-align:center">
+                <div class="form-row">
+                    <div class="form-group col-3 offset-3">
+                        <button type="submit" asp-controller="Room" asp-action="ReadRoomsOfSelectedFloor" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="bottom" title="View Available Rooms !"><i class="fa fa-info mr-2"></i> View Rooms</button>
+                    </div>
+                    <div class="form-group col-3">
+                        <button id="btnShowInsert" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Insert Rooms !"><i class="fa fa-info mr-2"></i> New Room</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="RoomGroup" class="card-footer col-12" style="display:none">
+                <div class="form-row">
+
+
+                    <div class="form-group col-6 offset-3">
+                        <label class="form-label">Room Name</label><br />
+                        @(Html.Kendo().TextBox()
+                            .Name("RoomName")
+                            .HtmlAttributes(new { style = "width:100%" })
+                        )
+                    </div>
+
+                    <div class="form-group col-6 offset-3">
+                        <label class="form-label">Room Grade</label><br />
+                        @(Html.Kendo().TextBox()
+                        .Name("RoomGrade")
+                        .HtmlAttributes(new { style = "width:100%" })
+                        )
+                    </div>
+
+                    <div class="form-group col-6 offset-3">
+                        <label class="form-label">Room Type</label><br />
+                        @(Html.Kendo().DropDownList()
+                            .Name("RoomTypeId")
+                            .HtmlAttributes(new { style = "width:100%" })
+                            .OptionLabel("Select Room Type")
+                            .DataTextField("Type")
+                            .DataValueField("Id")
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetRoomTypes", "Room");
+                                });
+                            })
+                        )
+                    </div>
+
+                    <div class="form-group col-6 offset-3">
+                        <label class="form-label">Room Capacity (Seats)</label><br />
+                        @(Html.Kendo().NumericTextBox()
+                        .Name("Capacity")
+                        .HtmlAttributes(new { style = "width: 100%" })
+                        )
+                    </div>
+
+                    <div class="form-group col-6 offset-3">
+                        <label class="form-label">Comment</label><br />
+                        @(Html.Kendo().TextBox()
+                        .Name("Comment")
+                        .HtmlAttributes(new { style = "width:100%" })
+                        )
+                    </div>
+                </div>
+
+                <div class="card-footer col-12" style="text-align:center">
+                    <button type="submit" asp-controller="Room" asp-action="InsertRoom" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="bottom" title="Save Room !"><i class="fa fa-save mr-2"></i> Save</button>
+                </div>
+
+            </div>
+        </form>
+
+        @(Html.Kendo().Grid(Model)
+        .Name("RoomGrid")
+        .Columns(columns =>
+        {
+            columns.Select().Width(40).HeaderHtmlAttributes(new { @style = "text-align:center" }).HtmlAttributes(new { @style = "text-align:center" });
+            columns.Bound(p => p.RoomName).Title("Room");
+            columns.Bound(p => p.RoomGrade).Title("Grade");
+            columns.Bound(p => p.RoomType).Title("Type");
+            columns.Bound(p => p.Capacity).Title("Size");
+            columns.Bound(p => p.Comment);
+            columns.Command(command =>
+                    {
+                command.Custom("Fac").Click("RoomFacilities").IconClass("k-icon k-i-toggle-full-screen-mode").HtmlAttributes(new { @class = "bg-dark" });
+                command.Custom("Img").Click("RoomImages").IconClass("k-icon k-i-image").HtmlAttributes(new { @class = "bg-info" });
+            }).Title("Add Facilities/ Images").Width(200);
+            columns.Command(command =>
+                    {
+                command.Custom("  ").Click("RoomDelete").IconClass("k-icon k-i-trash").HtmlAttributes(new { @class = "bg-danger" });
+            });
+
+            columns.Bound(p => p.RoomId).Title("RoomId").Hidden();
+
+        })
+        .ToolBar(toolbar =>
+        {
+
+            toolbar.Save().Text(" ").CancelText(" ");
+
+            toolbar.Excel().Text("Excel").HtmlAttributes(new { @class = "ml-5" });
+            toolbar.Pdf().Text("Pdf");
+            toolbar.Search();
+        })
+
+        .Editable(editable => editable.Mode(GridEditMode.InCell))
+        .Pageable()
+        .Sortable()
+        .Scrollable()
+        .HtmlAttributes(new { style = "height:550px;" })
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .PageSize(20)
+            .ServerOperation(false)
+            .Events(events => events.Error("errorHandler"))
+            .Model(model =>
+            {
+                model.Id(p => p.FloorId);
+            })
+        .Destroy(destroy => destroy.Action("DeleteRoom", "Room"))
+        )
+        )
+
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+    function errorHandler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            toastr.error(message);
+        }
+    }
+
+     function RoomFacilities(e)  {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+         var RoomName = dataItem.RoomName;
+         var RoomId = dataItem.RoomId;
+         window.location.href = '@Url.Action("RoomFacilityIndex", "RoomFacility")?roomName=' + RoomName + '&roomId=' + RoomId ;
+    }
+
+
+    function filterBlocks() {
+        return {
+            FacultyId: $("#FacultyId").val()
+        };
+    }
+    function filterFloors() {
+        return {
+            BlockId: $("#BlockId").val()
+        };
+    }
+
+    function RoomImages(e)  {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var RoomName = dataItem.RoomName;
+        var RoomId = dataItem.RoomId;
+        window.location.href = '@Url.Action("RoomGalleryIndex", "RoomGallery")?roomName=' + RoomName + '&roomId=' + RoomId;
+    }
+
+    function RoomDelete(e)  {
+        e.preventDefault();
+        var result = confirm("Are you sure to delete?");
+        if (result) {
+            var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+            var RoomName = dataItem.RoomName;
+            var RoomId = dataItem.RoomId;
+            window.location.href = '@Url.Action("RoomDelete", "Room")?roomName=' + RoomName + '&roomId=' + RoomId;
+        }
+    }
+
+
+
+</script>
+
+<script>
+    $(document).ready(function () {
+
+        $("#btnShowInsert").click(function (e) {
+            e.preventDefault();
+
+            var dropdown1 = $("#FacultyId").data("kendoDropDownList");
+            var dropdown2 = $("#BlockId").data("kendoDropDownList");
+            var dropdown3 = $("#FloorId").data("kendoDropDownList");
+
+            if (dropdown1.value() == "" ||
+                dropdown2.value() == "" ||
+                dropdown3.value() == "") {
+                return false;
+            }
+
+            $('#RoomGroup').show();
+        });
+    });
+</script>

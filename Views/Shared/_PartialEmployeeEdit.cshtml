@@ -1,0 +1,245 @@
+﻿@model LectureRoomMgt.Models.Staff.Employee;
+@*@{
+    var photoPath = "/Resources/DefaultUserBlack.png";
+
+    if (Model != null)
+    {
+        if (Model.ProfileImgPath != null)
+        {
+            photoPath = "/Resources/Uploads/Employees/" + Model.ProfileImgPath;
+        }
+    }
+}*@
+
+
+@*<script>
+    var ClearPreview2 = function () {
+        $("#MEmployeeImageFile").val('');
+        $("#Mdescription").text('');
+        $("#MtargetImg").attr('src', '/Resources/DefaultUserBlack.png');
+        $("#Mtrashbtn").hide();
+
+        $("#MhiddenImageDelete").val(true);
+    };
+
+</script>*@
+
+<form id="editForm">
+
+    @*<div class="form-row">
+        <div class="col-4 offset-4">
+            <div class="card card-dark card-outline">
+                <div class="card-header">
+                    <h3 class="card-title">Picture</h3>
+                </div>
+                <div class="img-thumbnail" id="MimgPreview">
+
+                    <img class="img-thumbnail" style="border-radius:50%" id="targetImg" src="@photoPath" />
+
+                    <div class="caption">
+                        @if (Model.MProfileImgPath != null)
+                        {
+                            <a id="Mtrashbtn" href="#" onclick="ClearPreview2()"><i class="fas fa-trash-alt"></i></a>
+                            <span id="Mdescription" style="font-size:12px"></span>
+                        }
+                        else
+                        {
+                            <a id="Mtrashbtn" style="display:none" href="#" onclick="ClearPreview2()"><i class="fas fa-trash-alt"></i></a>
+                            <span id="Mdescription" style="font-size:12px"></span>
+                        }
+                    </div>
+
+                </div>
+                <div class="btn-xs">
+                    <input asp-for="MEmployeeImageFile" type="file" accept="image/x-png,image/jpeg">
+                </div>
+            </div>
+        </div>
+
+    </div>*@
+
+    <div class="form-row">
+        <div class="col-12">
+            <div class="card card-dark card-outline">
+                <div class="card-header">
+                    <h3 class="card-title">Office Details</h3>
+                </div>
+                <input type="hidden" asp-for="EncryptEmpId" />
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label asp-for="MEmpId" class="control-label"></label>
+                            <input asp-for="MEmpId" class="form-control" disabled />
+                            <span asp-validation-for="MEmpId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group  col-md-4">
+                            <label asp-for="MJoinedDate" class="control-label required"></label>
+                            <input asp-for="MJoinedDate" class="form-control" />
+                            <span asp-validation-for="MJoinedDate" class="text-danger"></span>
+                        </div>
+                        <div class="form-group  col-md-4">
+                            <label asp-for="MDesignation" class="control-label required"></label>
+                            <select asp-for="MDesignation" asp-items="@ViewBag.Designation as SelectList" class="form-control">
+                                <option value="">Please select</option>
+                            </select>
+                            <span asp-validation-for="MDesignation" class="text-danger"></span>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="card card-dark card-outline">
+                <div class="card-header">
+                    <h3 class="card-title">Personal Details</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-3">
+                            <label asp-for="MTitle" class="control-label required"></label>
+                            <select asp-for="MTitle" asp-items="@ViewBag.Titles as SelectList" class="form-control">
+                                <option value="">Please select</option>
+                            </select>
+                            <span asp-validation-for="MTitle" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-9">
+                            <label asp-for="MSName" class="control-label required"></label>
+                            <input asp-for="MSName" class="form-control" />
+                            <span asp-validation-for="MSName" class="text-danger"></span>
+                        </div>
+
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label asp-for="MFName" class="control-label required"></label>
+                            <input asp-for="MFName" class="form-control" />
+                            <span asp-validation-for="MFName" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group  col-md-4">
+                            <label asp-for="MDob" class="control-label required"></label>
+                            <input asp-for="MDob" class="form-control" />
+                            <span asp-validation-for="MDob" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            <label asp-for="MGender" class="control-label required"></label>
+                            <select asp-for="MGender" asp-items="@ViewBag.Gender as SelectList" class="form-control">
+                                <option value="">Please select</option>
+                            </select>
+                            <span asp-validation-for="MGender" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card card-dark card-outline">
+                <div class="card-header">
+                    <h3 class="card-title">Contact Details</h3>
+                </div>
+                <div class="card-body">
+
+                    <div class="form-row">
+                        <div class="form-group col-md-8">
+                            <label asp-for="MEmail" class="control-label"></label>
+                            <input asp-for="MEmail" class="form-control" />
+                            <span asp-validation-for="MEmail" class="text-danger"></span>
+                        </div>
+
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label asp-for="MMobile" class="control-label required"></label>
+                            <input asp-for="MMobile" class="form-control" />
+                            <span asp-validation-for="MMobile" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label asp-for="MHomeTel" class="control-label"></label>
+                            <input asp-for="MHomeTel" class="form-control" />
+                            <span asp-validation-for="MHomeTel" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label asp-for="MOfficeTel" class="control-label"></label>
+                            <input asp-for="MOfficeTel" class="form-control" />
+                            <span asp-validation-for="MOfficeTel" class="text-danger"></span>
+                        </div>
+
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label asp-for="MComment" class="control-label"></label>
+                            <input asp-for="MComment" class="form-control" />
+                            <span asp-validation-for="MComment" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<input type="hidden" id="MhiddenImageDelete" />
+<input type="hidden" id="MimageChange" />
+
+<script>
+
+    $(document).ready(function () {
+
+        //$('#MEmployeeImageFile').change(function () {
+        //    var File = this.files;
+
+        //    if ((File[0].type != "image/jpeg") && (File[0].type != "image/png")) {
+
+        //        toastr.warning('Only JPEG & PNG files are allowed !');
+        //        $("#MEmployeeImageFile").val('');
+        //        return false;
+        //    }
+
+        //    if (File && File[0]) {
+
+        //        $("#MimageChange").val(true);
+        //        ReadImage(File[0]);
+        //    }
+        //});
+
+        //var ReadImage = function (file) {
+
+        //    var reader = new FileReader;
+        //    var image = new Image;
+
+        //    reader.readAsDataURL(file);
+        //    reader.onload = function (_file) {
+
+        //        image.src = _file.target.result;
+        //        image.onload = function () {
+
+        //            var height = this.height;
+        //            var width = this.width;
+        //            var type = file.type;
+        //            var sizetoKB = file.size / 1024;
+        //            var size = ~~(file.size / 1024) + "KB";
+
+        //            if (sizetoKB > 1024) {
+        //                $("#MupImage").val('');
+        //                alert("Image should be less than 1MB");
+        //                return false;
+        //            }
+        //            $("#MtargetImg").attr('src', _file.target.result);
+        //            $("#Mdescription").text("Size:" + size + ", " + height + "X " + width + ", " + type + "");
+        //            $("#Mtrashbtn").show();
+        //        }
+        //    }
+
+        //}
+    });
+
+
+</script>

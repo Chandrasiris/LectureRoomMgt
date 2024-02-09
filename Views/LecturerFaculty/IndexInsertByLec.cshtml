@@ -1,0 +1,106 @@
+@model LectureRoomMgt.Models.Lecturers.LeturerFacultyVM;
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+
+<div class="row">
+    <div class="col-6 offset-3">
+        <form id="facForm">
+            <div class="form-row">
+                <h4 class="text-success">My Faculties</h4>
+                <div class="form-group col-8 mb-3">
+                    <label asp-for="FacultyId" class="control-label"></label>
+                    <select asp-for="FacultyId" asp-items="@ViewBag.Faculties as SelectList" class="form-control">
+                        <option value="">Please select</option>
+                    </select>
+                    <span asp-validation-for="FacultyId" class="text-danger"></span>
+                </div>
+                <div class="form-group col-4 mb-3 mt-4">
+                    <div class="mt-2">
+                        <button id="btnFacSave" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Save !"><i class="fa fa-save"></i> Save</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-6 offset-3">
+        <form id="courseForm">
+            <div class="form-row">
+                <h4 class="text-success">My Courses</h4>
+                <div class="form-group col-8 mb-3">
+                    <label asp-for="CourseId" class="control-label"></label>
+                    <select asp-for="CourseId" asp-items="@ViewBag.Courses as SelectList" class="form-control">
+                        <option value="">Please select</option>
+                    </select>
+                    <span asp-validation-for="CourseId" class="text-danger"></span>
+                </div>
+                <div class="form-group col-4 mb-3 mt-4">
+                    <div class="mt-2">
+                        <button id="btnCourseSave" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Save !"><i class="fa fa-save"></i> Save</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+
+        $("#btnFacSave").click(function (e) {
+            e.preventDefault();
+            if (!$('#facForm').valid()) { return false; }
+            var obj = {
+                FacultyId: $('#FacultyId :selected').val(),
+                CallType: 'faculty'
+            };
+            //console.log(obj);
+            $.ajax({
+                type: "POST"
+                ,url: '@Url.Action("InsertByLecturer", "LecturerFaculty")'
+                ,data: obj
+                ,headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                if (response.status == "1") {
+                    window.location.replace(response.redirectUrl);
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (response) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+
+
+        $("#btnCourseSave").click(function (e) {
+            e.preventDefault();
+              if (!$('#courseForm').valid()) { return false; }
+            var obj = {
+                CourseId: $('#CourseId :selected').val(),
+                CallType: 'course'
+            };
+           // console.log(obj);
+            $.ajax({
+                type: "POST"
+                ,url: '@Url.Action("InsertByLecturer", "LecturerFaculty")'
+                ,data: obj
+                ,headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                if (response.status == "1") {
+                    window.location.replace(response.redirectUrl);
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (response) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+    });
+</script>
+
+

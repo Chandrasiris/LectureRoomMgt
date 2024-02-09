@@ -1,0 +1,297 @@
+﻿@model LectureRoomMgt.Models.Reservation.RoomReservationVM
+@using Kendo.Mvc.UI
+@using LectureRoomMgt.Models.Reservation
+<link href="~/custom/css/kendo.bootstrap-v4.min.css" rel="stylesheet" />
+<link href="~/custom/css/kendo.bootstrap-main.css" rel="stylesheet" />
+<script src="~/custom/js/kendo.all.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_jquery.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.all.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.aspnetmvc.min.js"></script>
+<script src="~/custom/js/kendo.aspnetmvc.min.js"></script>
+
+<script src="@Url.Content("~/scheduler/pako.min.js")"></script>
+<h6>Lecturer:</h6>
+<div data-container-for="LecturerId">
+    @(Html.Kendo().DropDownList()
+        .Name("LecturerId")
+        .HtmlAttributes(new { style = "width:100%" })
+        .OptionLabel("Select lecturer...")
+        .DataTextField("LecturerName")
+        .DataValueField("Id")
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetLecturers", "Reservation");
+            });
+        })
+    )
+</div>
+<h6 style="margin-top: 2em;">Course:</h6>
+<div data-container-for="CourseId">
+    @(Html.Kendo().DropDownList()
+        .Name("CourseId")
+        .HtmlAttributes(new { style = "width:100%" })
+        .OptionLabel("Select course...")
+        .DataTextField("CourseName")
+        .DataValueField("Id")
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetCoursesbyLec", "Reservation")
+                    .Data("filterCourses");
+            })
+            .ServerFiltering(true);
+        })
+        .Enable(false)
+        .AutoBind(false)
+        .CascadeFrom("LecturerId")
+    )
+</div>
+<br />
+<h6>Faculty:</h6>
+<div data-container-for="FacultyId">
+    @(Html.Kendo().DropDownList()
+        .Name("FacultyId")
+        .HtmlAttributes(new { style = "width:100%" })
+        .OptionLabel("Select faculty...")
+        .DataTextField("FacultyName")
+        .DataValueField("Id")
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetFaculties", "Reservation");
+            });
+        })
+    )
+</div>
+<h6 style="margin-top: 2em;">Block:</h6>
+@(Html.Kendo().DropDownList()
+        .Name("BlockId")
+        .HtmlAttributes(new { style = "width:100%" })
+        .OptionLabel("Select block...")
+        .DataTextField("BlockName")
+        .DataValueField("Id")
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetBlocks", "Reservation")
+                    .Data("filterBlocks");
+            })
+            .ServerFiltering(true);
+        })
+        .Enable(false)
+        .AutoBind(false)
+        .CascadeFrom("FacultyId")
+    )
+<h6 style="margin-top: 2em;">Floor:</h6>
+@(Html.Kendo().DropDownList()
+            .Name("FloorId")
+            .HtmlAttributes(new { style = "width:100%" })
+            .OptionLabel("Select floor...")
+            .DataTextField("FloorName")
+            .DataValueField("Id")
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("GetFloors", "Reservation")
+                        .Data("filterFloors");
+                })
+                .ServerFiltering(true);
+            })
+            .Enable(false)
+            .AutoBind(false)
+            .CascadeFrom("BlockId")
+    )
+<h6 style="margin-top: 2em;">Room:</h6>
+@(Html.Kendo().DropDownList()
+            .Name("room")
+            .HtmlAttributes(new { style = "width:100%" })
+            .OptionLabel("Select room...")
+            .DataTextField("RoomName")
+            .DataValueField("Id")
+            .Events(e => e.Change("change"))
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("GetRooms", "Reservation")
+                        .Data("filterRooms");
+                })
+                .ServerFiltering(true);
+            })
+            .Enable(false)
+            .AutoBind(false)
+            .CascadeFrom("FloorId")
+    )
+<br />
+<br />
+<div>
+    <input type="checkbox" id="myCheck" onclick="myFunction()"> &nbsp; View All Reservations
+</div>
+
+<br />
+<script id="event-template" type="text/x-kendo-template">
+    <div class="movie-template">
+        <h3>#= title #</h3>
+        # if (Image) { #
+        <img src="@Url.Content("~/scheduler/" + "#= Image #")"/>
+        # } #
+        <br><p>#= kendo.toString(start, 'hh:mm') # - #= kendo.toString(end, 'hh:mm') #</p>
+        <p>#= RoomName #</p>
+    </div>
+</script>
+@(Html.Kendo().Scheduler<LectureRoomMgt.Models.Reservation.RoomReservationVM>()
+    .Name("scheduler")
+    .Date(DateTime.Now)
+    .StartTime(new DateTime(2017, 1, 1, 6, 00, 00))
+    .Height(600)
+    .HtmlAttributes(new { style = "width:100%" })
+    .Pdf(pdf => pdf
+        .FileName("Kendo UI Scheduler Export.pdf")
+        .ProxyURL(Url.Action("Pdf_Export_Save", "Grid"))
+    )
+    .Toolbar(t =>
+    { t.Pdf(); t.Search(); }
+    )
+    .EventTemplate(
+                "<div class='movie-template'>" +
+                    "<img src='" + Url.Content("~/scheduler/") + "#= Image #' />" + "<h3>#= RoomName #</h3>" +
+                    "<p>" +
+                        "#= kendo.toString(start, 'hh:mm') # - #= kendo.toString(end, 'hh:mm') #" +
+                    "</p>" +
+                    "<h3>#= title #</h3>" +
+                "</div>")
+   .Views(views =>
+   {
+       views.DayView();
+       views.WeekView();
+       views.MonthView();
+       views.AgendaView();
+   })
+    .Timezone("Etc/UTC")
+    //.Group(group => group.Resources("RoomName"))
+    .DataSource(d => d
+        .Events(e => e.Error("onError"))
+        .Model(m =>
+        {
+            m.Id(f => f.ReservationId);
+            m.Field(f => f.Title).DefaultValue("No title");
+            m.Field(f => f.Start);
+            m.Field(f => f.RoomId);
+            m.RecurrenceId(f => f.RecurrenceID);
+        })
+        .Read(read => read.Action("Schedules_Read", "Reservation").Data("additionalData"))
+        .Create(create => create.Action("Schedules_Create", "Reservation").Data("additionalData"))
+        .Update(update => update.Action("Schedules_Update", "Reservation"))
+        .Destroy(destroy => destroy.Action("Schedules_Destroy", "Reservation"))
+    )
+)
+<style>
+    .k-scheduler {
+        font-family: "DejaVu Sans", "Arial", sans-serif;
+    }
+
+    .k-pdf-export .k-scheduler-toolbar,
+    .k-pdf-export .k-scheduler-navigation .k-nav-today,
+    .k-pdf-export .k-scheduler-navigation .k-nav-prev,
+    .k-pdf-export .k-scheduler-navigation .k-nav-next,
+    .k-pdf-export .k-scheduler-footer {
+        display: none;
+    }
+
+    .movie-template img {
+        float: left;
+        margin: 0 8px;
+    }
+
+    .movie-template p {
+        margin: 5px 0 0;
+    }
+
+    .movie-template h3 {
+        padding: 0 8px 5px;
+        font-size: 12px;
+    }
+
+    .movie-template a {
+        color: #ffffff;
+        font-weight: bold;
+        text-decoration: none;
+    }
+
+        .k-state-hover .movie-template a,
+        .movie-template a:hover {
+            color: #000000;
+        }
+
+    body, h1, h2, h3 {
+        margin: 0px;
+    }
+</style>
+<script type="text/javascript">
+    function onError(e) {
+        this.cancelChanges();
+        var errorMessage = "Error has happened!";
+        if (e.errors) {
+            for (var error in e.errors) {
+                errorMessage += e.errors[error].errors[0] + " ";
+            }
+        }
+        alert(errorMessage);
+    }
+
+    function additionalData() {
+        var dropdown = $("#room").data("kendoDropDownList");
+        var value = dropdown.value();
+        var dropdown2 = $("#LecturerId").data("kendoDropDownList");
+        var value2 = dropdown2.value();
+        var dropdown3 = $("#CourseId").data("kendoDropDownList");
+        var value3 = dropdown3.value();
+        var checkBox = document.getElementById("myCheck");
+        if (checkBox.checked == true) {
+            value = 0;
+        }
+        return { roomId: value, lecId: value2, courseId: value3 };
+    }
+    function change(e) {
+        var checkBox = document.getElementById("myCheck");
+        checkBox.checked = false;
+        var scheduler = $("#scheduler").data("kendoScheduler");
+        scheduler.dataSource.read();
+    }
+    function myFunction() {
+        var checkBox = document.getElementById("myCheck");
+        if (checkBox.checked == true) {
+            var scheduler = $("#scheduler").data("kendoScheduler");
+            scheduler.dataSource.read();
+        }
+    }
+</script>
+<script>
+    function filterBlocks() {
+        return {
+            FacultyId: $("#FacultyId").val()
+        };
+    }
+
+    function filterFloors() {
+        return {
+            BlockId: $("#BlockId").val()
+        };
+    }
+    function filterRooms() {
+        return {
+            FloorId: $("#FloorId").val()
+        };
+    }
+    function filterCourses() {
+        return {
+            LecturerId: $("#LecturerId").val()
+        };
+    }
+</script>

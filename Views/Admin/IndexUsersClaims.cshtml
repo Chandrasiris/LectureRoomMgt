@@ -1,0 +1,95 @@
+﻿@model LectureRoomMgt.Models.ViewModels.UserClaimsViewModel;
+@inject IAuthorizationService authorization
+@{
+    ViewBag.Title = "Add claims to the user";
+    ViewBag.View = ViewBag.UserName;
+}
+<form>
+    <div class="card">
+        <div class="card-header">
+            User Claims
+        </div>
+        <div class="card-body">
+            <div class="form-row">
+                <div class="card-columns">
+
+                    @foreach (var mainItem in (IEnumerable<LectureRoomMgt.Models.Claims.ClaimGroup>)ViewBag.GroupClaims)
+                    {
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <i class="fas fa-bezier-curve mr-2"></i>
+                                    @mainItem.Name
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                @foreach (var item in (IEnumerable<LectureRoomMgt.Models.ViewModels.ClaimViewModel>)ViewBag.List)
+                                {
+                                    if (@item.GroupId == mainItem.GroupId)
+                                    {
+                                        <div class="col-12">
+                                            <div class="custom-control custom-checkbox">
+                                                <input asp-for="@item.IsSelected" type="checkbox" class="custom-control-input" id="@item.ClaimTypeValue">
+                                                <label asp-for="@item.IsSelected" class="custom-control-label" for="@item.ClaimTypeValue">@item.ClaimType</label>
+                                            </div>
+                                        </div>
+
+                                    }
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        @if ((await authorization.AuthorizeAsync(User, "CreateUserClaim")).Succeeded)
+        {
+            <div class="card-footer">
+                <a asp-controller="Admin" asp-action="IndexUsers" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="bottom" title="Back to users !"><i class="fas fa-arrow-alt-circle-left"></i> Back</a>
+                <button id="btnSave" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Update !"><i class="fa fa-save"></i> Update</button>
+            </div>
+
+        }
+    </div>
+</form>
+<input type="hidden" id="hiddenUserID" value="@ViewBag.UserId" />
+
+<script>
+    $(document).ready(function () {
+
+        $("#btnSave").click(function (e) {
+                e.preventDefault();
+
+                var list = [];
+                $('input[type=checkbox]').each(function () {
+
+                    var listItem = {
+                        ClaimType: $(this).attr('id'),
+                        IsSelected: $(this).is(':checked')
+                    }
+                    list.push(listItem);
+                });
+
+                var UserClaimsObj = {
+                    claimsList : list,
+                    userId: $('#hiddenUserID').val()
+                };
+
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("CreateUsersClaims", "Admin")',
+                    data: UserClaimsObj,
+                    headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+                }).done(function (response) {
+                    if (response.status == "1") {
+                        toastr.success('Saved successfuly !');
+                    }
+                    else {
+                        toastr.error('An error has occured !');
+                    }
+                }).fail(function (response) {
+                    toastr.error('An unknown error has occured, Please contact administrator !');
+                });
+            });
+    });
+</script>

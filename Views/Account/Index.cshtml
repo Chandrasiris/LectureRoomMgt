@@ -1,0 +1,452 @@
+﻿@model LectureRoomMgt.Models.ViewModels.UserViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Lecture-Room Mgt | Log in</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <link rel="stylesheet" href="~/Theme/plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link rel="stylesheet" href="~/Theme/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="~/Theme/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    <link href="~/lib/toastr.js/toastr.min.css" rel="stylesheet" />
+    <link href="~/custom/css/Login.css" rel="stylesheet" />
+
+    <style>
+        .modal .modal-dialog-aside {
+            width: 450px;
+            max-width: 80%;
+            height: 80%;
+            margin: 0;
+            transform: translate(0);
+            transition: transform .2s;
+        }
+
+            .modal .modal-dialog-aside .modal-content {
+                height: inherit;
+                border: 0;
+                border-radius: 0;
+            }
+
+                .modal .modal-dialog-aside .modal-content .modal-body {
+                    overflow-y: auto
+                }
+
+        .modal.fixed-left .modal-dialog-aside {
+            margin-left: auto;
+            transform: translateX(100%);
+        }
+
+        .modal.fixed-right .modal-dialog-aside {
+            margin-right: auto;
+            transform: translateX(-100%);
+        }
+
+        .modal.show .modal-dialog-aside {
+            transform: translateX(0);
+        }
+
+        .responsive {
+            width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="loader" class="modal" style="width:100%;height:100%;position:fixed;margin:0;padding:0;text-align:center">
+        <div style="position:absolute;top:50%;left:50%">
+            <img src="~/Resources/loader.gif" width="100" height="100" />
+        </div>
+    </div>
+
+    <div class="modal fade fixed-left" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="registerModalLabel">Register User <i class="fas fa-user-plus ml-2"></i></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="myModalBody">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success btn-sm" id="btnRegister">Register</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade fixed-left" id="registerStudentModal" tabindex="-1" role="dialog" aria-labelledby="registerStudentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-aside modal-sm" role="document">
+            <div class="modal-content" style="height:50%">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="registerStudentModalLabel">Register Student <i class="fas fa-laugh ml-2"></i></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="myModalBodyStudent">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-info btn-sm" id="btnRegisterStudent">Next...</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade fixed-left" id="reqAccessCodeModal" tabindex="-1" role="dialog" aria-labelledby="reqAccessCodeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reqAccessCodeModalLabel">Request Access Code <i class="fas fa-smile ml-2"></i></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="myReqCodeModalBody">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success btn-sm" id="btnReqCode">Send the access code</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade fixed-left" id="forgotPasswordModal" tabindex="-1" role="dialog" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-aside" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="forgotPasswordModalLabel">Forgot Password <i class="fas fa-frown ml-2"></i></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="forgotPasswordModalBody">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success btn-sm" id="btnFogPw">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div>
+        <div class="row">
+            <div class="col-md-8" style="background-image: url('../../Resources/CMS.jpg');background-repeat: no-repeat;background-size: contain">
+            </div>
+            <div class="col-md-4 login-form">
+                <div>
+                    <img class="mb-2" src="~/Resources/WisdomSign.png" />
+                </div>
+                <div>
+                    <label style="font-size:large;">Class Room Management System</label>
+                </div>
+                <br />
+
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <span asp-validation-for="Username" class="text-danger"></span>
+
+                    <div class="input-group mb-3">
+                        <input asp-for="Username" class="form-control" placeholder="Username" />
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-user"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                    <div class="input-group mb-3">
+                        <input asp-for="Password" type="password" class="form-control" placeholder="Password" />
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-lock"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-block btn-flat" style="border-radius: 0.4rem">Sign In</button>
+                    </div>
+                </form>
+                <hr />
+                <div>
+                    <form method="post" asp-action="ExternalLogin" asp-route-returnUrl="">
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-danger btn-block btn-flat" style="border-radius: 0.4rem" name="provider" value="Google">
+                                    <i class="fab fa-google-plus mr-2"></i> KLN Login
+                                </button>
+                            </div>
+                            @*<div class="col-5 offset-2">
+                                <button type="submit" class="btn btn-primary btn-block btn-flat" style="border-radius: 0.4rem" name="provider" value="Facebook">
+                                    <i class="fab fa-facebook mr-2"></i> Facebook
+                                </button>
+                            </div>*@
+                        </div>
+                    </form>
+                </div>
+                <hr />
+                <br />
+                <div class="form-group">
+                    <span>
+                        <i class="fas fa-plus nav-icon"></i>
+                        <a id="RegisterUser">Create login</a>
+                    </span>
+
+                </div>
+                <div class="form-group">
+                    <spn>
+                        <i class="fas fa-question nav-icon"></i>
+                        <a id="ForgotPassword">Forgot password</a>
+
+                    </spn>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/Theme/plugins/jquery/jquery-3.4.1.min.js"></script>
+    <script src="~/lib/jquery-validate/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/Theme/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/Theme/dist/js/adminlte.min.js"></script>
+    <script src="~/lib/toastr.js/toastr.min.js"></script>
+
+    <script>
+
+    $(document).ready(function () {
+
+        var errorMsg = '';
+        var MessageList = function (response) {
+
+            for (var i = 0; i < response.errorList.length; i++) {
+                errorMsg = errorMsg + '<li>' + response.errorList[i] + '</li>';
+            }
+        }
+
+
+
+        $("#RegisterUser").click(function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("Register", "Account")',
+                contentType: "application/json; charset=utf-8",
+                datatype: "json",
+            }).done(function (response) {
+                $('#myModalBody').html(response);
+                $('#registerModal').modal('show');
+            });
+        });
+
+
+        $("#RequestAccessCode").click(function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("RequestCode", "Account")',
+                contentType: "application/json; charset=utf-8",
+                datatype: "json",
+            }).done(function (response) {
+                $('#myReqCodeModalBody').html(response);
+                $('#reqAccessCodeModal').modal('show');
+            });
+        });
+
+        $("#ForgotPassword").click(function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("ForgotPassword", "Account")',
+                contentType: "application/json; charset=utf-8",
+                datatype: "json",
+            }).done(function (response) {
+                $('#forgotPasswordModalBody').html(response);
+                $('#forgotPasswordModal').modal('show');
+            });
+        });
+
+
+        $("#btnRegister").click(function (e) {
+            e.preventDefault();
+            $.validator.unobtrusive.parse($('#registerUser'));
+
+            if (!$('#registerUser').valid()) {
+                return false;
+            }
+            var UserObj = {
+                AccessCode: $('#AccessCode').val(),
+                Username: $('#MUsername').val(),
+                Password: $('#MPassword').val(),
+                ConfirmPassword: $('#MConfirmPassword').val()
+            };
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: '@Url.Action("Register", "Account")',
+                dataType: "json",
+                data: JSON.stringify(UserObj),
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                if (response.status == "1") {
+                    $('#registerModal').modal('hide');
+                    toastr.success('Registration is successful. Please wait for approval.');
+                }
+                else if (response.status == "2") {
+                    $('#registerModal').modal('hide');
+                    toastr.success('Registration is successful');
+                }
+                else if (response.status == "7") {
+                    toastr.info('Your account is deactivated :(');
+                }
+                else if (response.status == "3") {
+                    errorMsg = '';
+                    MessageList(response);
+                    toastr.error(errorMsg);
+                }
+                else{
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (response) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+
+
+        $("#btnReqCode").click(function (e) {
+            e.preventDefault();
+
+            $.validator.unobtrusive.parse($('#requestAccessCode'));
+
+            if (!$('#requestAccessCode').valid()) {
+                return false;
+            }
+            var EmailObj = {
+                UserType: $("input[type='radio']:checked").val(),
+                Name : $('#Name').val(),
+                NIC : $('#NIC').val(),
+                Tel: $('#Tel').val(),
+                Email: $('#Email').val()
+            };
+
+            $('#loader').show();
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: '@Url.Action("RequestCode", "Account")',
+                dataType: "json",
+                data: JSON.stringify(EmailObj),
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                $('#loader').hide();
+                if (response.status == "1") {
+                    $('#reqAccessCodeModal').modal('hide');
+                    toastr.success('An access code was sent to the email !');
+                }
+                else if (response.status == "2") {
+                    toastr.warning('Name, NIC & Telephone fields are mandatory !');
+                }
+                else if (response.status == "3") {
+                    toastr.error('Please contact administrator !');
+                }
+                else if (response.status == "4") {
+                    toastr.error('An error has occured !');
+                }
+                else if (response.status == "6") {
+                    toastr.warning('The email is not verified yet !');
+                }
+                else{
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (response) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+
+        $("#btnFogPw").click(function (e) {
+            e.preventDefault();
+
+            $.validator.unobtrusive.parse($('#forgotPw'));
+
+            if (!$('#forgotPw').valid()) {
+                return false;
+            }
+            var FogpwObj = {
+                ForgotPwType: $("input[type='radio']:checked").val(),
+                ResetToken: $('#ResetToken').val(),
+                Username: $('#MUsername').val(),
+                NewPassword: $('#NewPassword').val(),
+                Email: $('#PEmail').val()
+            };
+
+            $('#loader').show();
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: '@Url.Action("ForgotPassword", "Account")',
+                dataType: "json",
+                data: JSON.stringify(FogpwObj),
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                $('#loader').hide();
+                if (response.status == "1") {
+                    $('#forgotPasswordModal').modal('hide');
+                    toastr.success('A reset token was sent to the email !');
+                }
+                else if (response.status == "2") {
+                    $('#forgotPasswordModal').modal('hide');
+                    toastr.success('Password changed successfully !');
+                }
+                else if (response.status == "2.1") {
+                    toastr.warning('Sorry, you do not have the privilleges :( !');
+                }
+                else if (response.status == "3") {
+                    toastr.error('User does not exit !');
+                }
+                else if (response.status == "4") {
+                    toastr.error('Please check your reset token !');
+                }
+                else if (response.status == "5") {
+                    toastr.error('Password combination is incorrect !');
+                }
+                else{
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (response) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+
+    });
+    </script>
+
+</body>
+</html>
+

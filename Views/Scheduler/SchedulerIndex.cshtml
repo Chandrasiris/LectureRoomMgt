@@ -1,0 +1,135 @@
+﻿@using Kendo.Mvc.UI
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@Html.AntiForgeryToken()
+<link href="~/custom/css/kendo.bootstrap-v4.min.css" rel="stylesheet" />
+<link href="~/custom/css/kendo.bootstrap-main.css" rel="stylesheet" />
+<script src="~/custom/js/kendo.all.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_jquery.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.all.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.aspnetmvc.min.js"></script>
+<script src="~/custom/js/kendo.aspnetmvc.min.js"></script>
+
+
+@*<h6>Faculty:</h6>
+    <div data-container-for="FacultyId">
+        @(Html.Kendo().DropDownListFor(model =>model.FacultyId )
+            //.Name("FacultyId")
+            .HtmlAttributes(new { style = "width:100%" })
+            .OptionLabel("Select faculty...")
+            .DataTextField("FacultyName")
+            .DataValueField("Id")
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("GetFaculties", "Reservation");
+                });
+            })
+        )
+    </div>
+    <h6 style="margin-top: 2em;">Block:</h6>
+    @(Html.Kendo().DropDownList()
+            .Name("BlockId")
+            .HtmlAttributes(new { style = "width:100%" })
+            .OptionLabel("Select block...")
+            .DataTextField("BlockName")
+            .DataValueField("Id")
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("GetBlocks", "Reservation")
+                        .Data("filterBlocks");
+                })
+                .ServerFiltering(true);
+            })
+            .Enable(false)
+            .AutoBind(false)
+            .CascadeFrom("FacultyId")
+        )
+    <h6 style="margin-top: 2em;">Floor:</h6>
+    @(Html.Kendo().DropDownList()
+                .Name("FloorId")
+                .HtmlAttributes(new { style = "width:100%" })
+                .OptionLabel("Select floor...")
+                .DataTextField("FloorName")
+                .DataValueField("Id")
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("GetFloors", "Reservation")
+                            .Data("filterFloors");
+                    })
+                    .ServerFiltering(true);
+                })
+                .Enable(false)
+                .AutoBind(false)
+                .CascadeFrom("BlockId")
+        )
+    <h6 style="margin-top: 2em;">Room:</h6>
+    @(Html.Kendo().DropDownList()
+                .Name("RoomId")
+                .HtmlAttributes(new { style = "width:100%" })
+                .OptionLabel("Select room...")
+                .DataTextField("RoomName")
+                .DataValueField("Id")
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("GetRooms", "Reservation")
+                            .Data("filterRooms");
+                    })
+                    .ServerFiltering(true);
+                })
+                .Enable(false)
+                .AutoBind(false)
+                .CascadeFrom("FloorId")
+        )*@
+@(Html.Kendo().Scheduler<LectureRoomMgt.Models.Scheduler.TaskViewModel>()
+        .Name("scheduler")
+        .Date(new DateTime(2022, 5, 01))
+        .StartTime(new DateTime(2022, 5, 01, 7, 00, 00))
+        .Height(600)
+        .Views(views =>
+        {
+            views.DayView();
+            views.WeekView(weekView => weekView.Selected(true));
+            views.TimelineView();
+        })
+         .Editable(e => e.TemplateName("~/Views/Shared/EditorTemplates/CustomEditor.cshtml"))
+        .Timezone("Etc/UTC")
+        .DataSource(d => d
+            .Model(m =>
+            {
+                m.Id(f => f.TaskID);
+                m.RecurrenceId(f => f.RecurrenceID);
+                m.Field(f => f.Title).DefaultValue("No title");
+                m.Field(f => f.OwnerID).DefaultValue(1);
+                m.Field(f => f.LecturerId);
+            })
+            .Read("Read", "Scheduler")
+            .Create("Create", "Scheduler")
+            .Destroy("Destroy", "Scheduler")
+            .Update("Update", "Scheduler")
+        )
+    )
+@*<script>
+        function filterBlocks() {
+            return {
+                FacultyId: $("#FacultyId").val()
+            };
+        }
+
+        function filterFloors() {
+            return {
+                BlockId: $("#BlockId").val()
+            };
+        }
+        function filterRooms() {
+            return {
+                FloorId: $("#FloorId").val()
+            };
+        }
+    </script>*@

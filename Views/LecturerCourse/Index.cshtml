@@ -1,0 +1,115 @@
+﻿@using LectureRoomMgt.Models.Reservation
+@model LectureRoomMgt.Models.Courses.LecturerCourse;
+@using Kendo.Mvc.UI
+<link href="~/custom/css/kendo.bootstrap-main.css" rel="stylesheet" />
+<link href="~/custom/css/kendo6.4.0_bootstrap_bootstrap-main.css" rel="stylesheet" />
+<script src="~/custom/js/jszip.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_jquery.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.all.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.aspnetmvc.min.js"></script>
+<div class="k-d-flex k-justify-content-center" style="padding-top: 54px;">
+    <div class="k-w-300">
+        <form>
+            <div class="k-d-flex" style="padding-left: 24px;">
+                <div>
+                    <h3> My course/s:</h3>
+                    @(Html.Kendo().MultiSelect()
+                        .Name("CourseIds")
+
+                        .AutoClose(false)
+                        .Placeholder("Select course/s...")
+                        .DataTextField("CourseName")
+                        .DataValueField("Id")
+                        .DataSource(source => {
+                          source.Read(read =>
+                          {
+                              read.Action("GetCourse", "LecturerCourse");
+                          })
+                          .ServerFiltering(false);
+                        })
+                        )
+                </div>
+            </div>
+            <br />
+            <input name="LecturerId" value=@ViewBag.LecId hidden />
+            <button id="get" type="submit" class="b" asp-controller="LecturerCourse" asp-action="SaveCourse">Save Course</button>
+        </form>
+    </div>
+</div>
+
+
+        <script type="text/javascript">
+            function errorHandler(e) {
+                if (e.errors) {
+                    var message = "Errors:\n";
+                    $.each(e.errors, function (key, value) {
+                        if ('errors' in value) {
+                            $.each(value.errors, function () {
+                                message += this + "\n";
+                            });
+                        }
+                    });
+                    alert(message);
+                }
+            }
+            //$("#multiselect").kendoMultiSelect({
+            //    close: function (e) {
+            //        e.preventDefault();
+            //    },
+            //    dataBound: function (e) {
+            //        if (e.sender.ul.height() < 200) {
+            //            e.sender.ul.height(200);
+            //        }
+
+            //        e.sender.open();
+            //    }
+            //});
+        </script>
+
+        <style>
+            .fieldlist {
+                margin: 0 0 -1em;
+                padding: 0;
+            }
+
+                .fieldlist li {
+                    list-style: none;
+                    padding-bottom: 1em;
+                }
+
+            .b {
+                background-color: #4CAF50; /* Green */
+                border: none;
+                color: white;
+                padding: 15px 32px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                margin: 4px 2px;
+                cursor: pointer;
+                font-size: 16px;
+            }
+
+            .k-multiselect-wrap {
+                height: 25px;
+            }
+
+                .k-multiselect-wrap li {
+                    font-size: 8px;
+                }
+
+                .k-multiselect-wrap .k-input {
+                    font-size: 10px;
+                }
+
+            .k-list .k-item {
+                font-size: 10px;
+            }
+
+            #get {
+                float: right;
+                margin: 25px auto 0;
+            }
+        </style>
+
+

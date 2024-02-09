@@ -1,0 +1,251 @@
+﻿@model LectureRoomMgt.Models.Lecturers.Lecturer;
+@{
+    var photoPath = "/Resources/DefaultUserBlack.png";
+
+    if (Model != null)
+    {
+        if (Model.ProfileImgPath != null)
+        {
+            photoPath = "/Resources/Uploads/Lecturers/" + Model.ProfileImgPath;
+        }
+    }
+
+}
+
+
+<script>
+    var ClearPreview = function () {
+        $("#LecturerImageFile").val('');
+        $("#description").text('');
+        $("#targetImg").attr('src', '/Resources/DefaultUserBlack.png');
+        $("#trashbtn").hide();
+
+        $("#hiddenImageDelete").val(true);
+    };
+
+</script>
+
+<form id="editForm">
+    <input type="hidden" asp-for="EncryptLecturerId" />
+    <div class="form-row">
+        <div class="col-4 offset-4">
+            <div class="card card-dark card-outline">
+                <div class="card-header">
+                    <h3 class="card-title">Picture</h3>
+                </div>
+                    <div class="img-thumbnail" id="imgPreview">
+
+                        <img class="img-thumbnail" style="border-radius:50%" id="targetImg" src="@photoPath" />
+
+                        <div class="caption">
+                            @if (Model != null)
+                            {
+                                if (Model.ProfileImgPath != null)
+                                {
+                                    <a id="trashbtn" href="#" onclick="ClearPreview()"><i class="fas fa-trash-alt"></i></a>
+                                    <span id="description" style="font-size:12px"></span>
+                                }
+                                else
+                                {
+                                    <a id="trashbtn" style="display:none" href="#" onclick="ClearPreview()"><i class="fas fa-trash-alt"></i></a>
+                                    <span id="description" style="font-size:12px"></span>
+                                }
+                            }
+                            else
+                            {
+                                <a id="trashbtn" style="display:none" href="#" onclick="ClearPreview()"><i class="fas fa-trash-alt"></i></a>
+                                <span id="description" style="font-size: 12px"></span>
+                            }
+                        </div>
+
+                    </div>
+                    <div class="btn-xs">
+                        <input asp-for="LecturerImageFile" type="file" accept="image/x-png,image/jpeg">
+                    </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="form-row">
+        <div class="col-12">
+            <div class="card card-dark card-outline">
+                <div class="card-header">
+                    <h3 class="card-title">Office Details</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-3">
+                            <label asp-for="LecturerId" class="control-label"></label>
+                            <input asp-for="LecturerId" class="form-control" disabled />
+                            <span asp-validation-for="LecturerId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group  col-md-3">
+                            <label asp-for="JoinedDate" class="control-label required"></label>
+                            <input asp-for="JoinedDate" class="form-control" />
+                            <span asp-validation-for="JoinedDate" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="card card-dark card-outline">
+                <div class="card-header">
+                    <h3 class="card-title">Personal Details</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-3">
+                            <label asp-for="Title" class="control-label required"></label>
+                            <select asp-for="Title" asp-items="@ViewBag.Titles as SelectList" class="form-control">
+                                <option value="">Please select</option>
+                            </select>
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-9">
+                            <label asp-for="SName" class="control-label required"></label>
+                            <input asp-for="SName" class="form-control" />
+                            <span asp-validation-for="SName" class="text-danger"></span>
+                        </div>
+
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label asp-for="FName" class="control-label required"></label>
+                            <input asp-for="FName" class="form-control" />
+                            <span asp-validation-for="FName" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+
+                        <div class="form-group  col-md-4">
+                            <label asp-for="Dob" class="control-label required"></label>
+                            <input asp-for="Dob" class="form-control" />
+                            <span asp-validation-for="Dob" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            <label asp-for="Gender" class="control-label required"></label>
+                            <select asp-for="Gender" asp-items="@ViewBag.Gender as SelectList" class="form-control">
+                                <option value="">Please select</option>
+                            </select>
+                            <span asp-validation-for="Gender" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label asp-for="Qualifications" class="control-label"></label>
+                            <textarea asp-for="Qualifications" class="form-control"></textarea>
+                            <span asp-validation-for="Qualifications" class="text-danger"></span>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+            <div class="card card-dark card-outline">
+                <div class="card-header">
+                    <h3 class="card-title">Contact Details</h3>
+                </div>
+                <div class="card-body">
+
+                    <div class="form-row">
+                        <div class="form-group col-md-8">
+                            <label asp-for="Email" class="control-label"></label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label asp-for="Mobile" class="control-label required"></label>
+                            <input asp-for="Mobile" class="form-control" />
+                            <span asp-validation-for="Mobile" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label asp-for="HomeTel" class="control-label"></label>
+                            <input asp-for="HomeTel" class="form-control" />
+                            <span asp-validation-for="HomeTel" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label asp-for="OfficeTel" class="control-label"></label>
+                            <input asp-for="OfficeTel" class="form-control" />
+                            <span asp-validation-for="OfficeTel" class="text-danger"></span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</form>
+
+
+<input type="hidden" id="hiddenImageDelete" />
+<input type="hidden" id="imageChange" />
+
+<script>
+
+    $(document).ready(function () {
+
+        $('#LecturerImageFile').change(function () {
+            var File = this.files;
+
+            if ((File[0].type != "image/jpeg") && (File[0].type != "image/png")) {
+
+                toastr.warning('Only JPEG & PNG files are allowed !');
+                $("#LecturerImageFile").val('');
+                return false;
+            }
+
+            if (File && File[0]) {
+
+                $("#imageChange").val(true);
+                ReadImage(File[0]);
+            }
+        });
+
+        var ReadImage = function (file) {
+
+            var reader = new FileReader;
+            var image = new Image;
+
+            reader.readAsDataURL(file);
+            reader.onload = function (_file) {
+
+                image.src = _file.target.result;
+                image.onload = function () {
+
+                    var height = this.height;
+                    var width = this.width;
+                    var type = file.type;
+                    var sizetoKB = file.size / 1024;
+                    var size = ~~(file.size / 1024) + "KB";
+
+                    if (sizetoKB > 1024) {
+                        $("#upImage").val('');
+                        alert("Image should be less than 1MB");
+                        return false;
+                    }
+                    $("#targetImg").attr('src', _file.target.result);
+                    $("#description").text("Size:" + size + ", " + height + "X " + width + ", " + type + "");
+                    $("#trashbtn").show();
+                }
+            }
+
+        }
+    });
+
+
+</script>

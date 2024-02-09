@@ -1,0 +1,156 @@
+﻿@model LectureRoomMgt.Models.Reservation.BlockVM
+@{
+    ViewBag.Title = "Lecturer";
+
+}
+<style>
+    .container {
+        overflow-y: scroll;
+        scrollbar-width: none;
+        /* Firefox */
+        -ms-overflow-style: none;
+        /* Internet Explorer 10+ */
+    }
+
+        .container::-webkit-scrollbar {
+            /* WebKit */
+            width: 0;
+            height: 0;
+        }
+</style>
+
+@Html.AntiForgeryToken()
+<div class="row" style="position:relative">
+    <img src="~/Resources/LecHomeBg.jpeg" style="width:100%; opacity:0.9" />
+    <div class="col-12" style="position:absolute">
+        <form id="saveForm">
+            <div class="form-row mb-2">
+                <div class="card-footer col-12" style="text-align:center">
+                    <div class="form-group col-4 offset-4">
+                        <label asp-for="FacultyId" class="form-label"></label><br />
+                        <select asp-for="FacultyId" asp-items="@ViewBag.Faculties as SelectList" class="form-control col-12">
+                            <option value="">Please select</option>
+                        </select>
+                        <span asp-validation-for="FacultyId" class="text-danger"></span>
+                    </div>
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6" id="blockContainer" style="height:400px; overflow-y:auto">
+
+                </div>
+
+                <div class="col-6 container" style="height:400px; overflow-y:auto">
+                    <div class="col-12">
+                        <div class="card card-default" style="opacity:0.9; background-color:lightgrey">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <i class="fas fa-calendar-check"></i>
+                                    My reservations
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                @foreach (var mainItem in (IEnumerable<LectureRoomMgt.Models.Reservation.RoomReservation>)ViewBag.BookedRooms)
+                                {
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="info-box">
+                                                <span class="info-box-icon bg-warning"><i class="fas fa-landmark"></i></span>
+                                                @if ((mainItem.Status == "A" || mainItem.Status == "Completed") && mainItem.Start >= System.DateTime.Now)
+                                                {
+                                                    <div class="info-box-content">
+                                                        <img src="~/Resources/green-tick.jpg" />
+                                                        <span class="info-box-text"><b>@mainItem.Room.RoomName</b></span>
+                                                        <span class="info-box-text">@mainItem.Start.ToString("ddd, dd MMM yyyy") <br />@mainItem.Start.ToString("hh:mm tt") to @mainItem.End.ToString("hh:mm tt") <br />@mainItem.Description</span>
+                                                    </div>
+                                                }
+                                                else if (mainItem.Status == "Created" && mainItem.Start >= System.DateTime.Now)
+                                                {
+                                                    <div class="info-box-content">
+                                                        <img src="~/Resources/redcross.png" />
+                                                        <span class="info-box-text"><b>@mainItem.Room.RoomName</b></span>
+                                                        <span class="info-box-text">@mainItem.Start.ToString("ddd, dd MMM yyyy") <br />@mainItem.Start.ToString("hh:mm tt") to @mainItem.End.ToString("hh:mm tt") <br />@mainItem.Description</span>
+                                                    </div>
+                                                }
+                                                else if (mainItem.Start < System.DateTime.Now)
+                                                {
+                                                    <div class="info-box-content">
+                                                        <img src="~/Resources/finished.png" />
+                                                        <span class="info-box-text"><b>@mainItem.Room.RoomName</b></span>
+                                                        <span class="info-box-text">@mainItem.Start.ToString("ddd, dd MMM yyyy") <br />@mainItem.Start.ToString("hh:mm tt") to @mainItem.End.ToString("hh:mm tt") <br />@mainItem.Description</span>
+                                                    </div>
+                                                }
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        $('#FacultyId').change(function () {
+            event.preventDefault();
+
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("LoadBlocksByFaculty", "Home")',
+                contentType: "application/json; charset=utf-8",
+                data: { facId: $('#FacultyId :selected').val() },
+                datatype: "json",
+            }).done(function (response) {
+
+                $('#blockContainer').html(response);
+            });
+        });
+
+
+        $(".btnView").click(function (e) {
+            e.preventDefault();
+
+            if (!$('#saveForm').valid()) {
+                return false;
+            }
+
+            var blockVM = {
+                FacultyId: $('#FacultyId :selected').val(),
+                CallType: $(this).attr('id')
+            };
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("BlockIndex", "Blocks")',
+                data: blockVM,
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+
+            }).done(function (response) {
+                if (response.status == "1") {
+                    window.location.replace(response.redirectUrl);
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (response) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+
+    });
+</script>
+<style>
+    img {
+        float:right;
+        width:50px;
+    }
+    </style>

@@ -1,0 +1,12 @@
+﻿@model LectureRoomMgt.Models.ViewModels.RolesViewModel;
+
+<form id="editForm">
+    <div class="form-row">
+        <input type="hidden" asp-for="EncryptRoleId" />
+        <div class="form-group col-12 mb-3">
+            <label asp-for="MRolename" class="control-label"></label>
+            <input asp-for="MRolename" class="form-control"/>
+            <span asp-validation-for="MRolename" class="text-danger"></span>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,26 @@
+﻿@model LectureRoomMgt.Models.ViewModels.UserViewModel;
+
+<form id="editForm">
+    <div class="form-row">
+        <input type="hidden" asp-for="EncryptUserId" />
+        <div class="form-group col-12 mb-3">
+            <label asp-for="MUsername" class="control-label"></label>
+            <input asp-for="MUsername" class="form-control" readonly />
+            <span asp-validation-for="MUsername" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-12 mb-3">
+            <label asp-for="MPassword" class="control-label"></label>
+            <input asp-for="MPassword" class="form-control" />
+            <span asp-validation-for="MPassword" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-12 mb-3">
+            <label asp-for="MConfirmPassword" class="control-label"></label>
+            <input asp-for="MConfirmPassword" class="form-control" />
+            <span asp-validation-for="MConfirmPassword" class="text-danger"></span>
+        </div>
+    </div>
+</form>

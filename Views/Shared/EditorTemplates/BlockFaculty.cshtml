@@ -1,0 +1,7 @@
+﻿@model LectureRoomMgt.Models.Reservation.FacultyDD
+@using Kendo.Mvc.UI
+@(Html.Kendo().DropDownListFor(m => m)
+            .DataValueField("FacultyId")
+            .DataTextField("FacultyName")
+            .BindTo((System.Collections.IEnumerable)ViewData["faculties"])
+)

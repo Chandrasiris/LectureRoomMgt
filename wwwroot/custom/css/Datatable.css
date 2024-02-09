@@ -1,0 +1,7 @@
+﻿.dataTables_scrollHeadInner, .table {
+    width: 100% !important;
+}
+
+table.dataTable tbody th, table.dataTable tbody td {
+    padding: 3px 10px;
+}

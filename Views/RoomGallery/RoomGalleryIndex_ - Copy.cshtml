@@ -1,0 +1,180 @@
+﻿@model LectureRoomMgt.Models.Reservation.RoomImageVM
+@using Kendo.Mvc.UI
+<link href="~/custom/css/kendo.bootstrap-v4.min.css" rel="stylesheet" />
+<script src="~/custom/js/kendo.all.min.js"></script>
+<script src="~/custom/js/kendo.aspnetmvc.min.js"></script>
+
+
+<div>
+    @(Html.Kendo().Upload()
+        .Name("files")
+        .Async(a => a
+            .Save("Save2", "RoomGallery")
+            //.Remove("RemoveAsync", "Home")
+            .AutoUpload(true)
+        )
+    )
+</div>
+
+
+
+
+
+@*<form method="post" asp-action="Save" asp-controller="RoomGallery" >*@
+@using (Html.BeginForm("Save", "RoomGallery", FormMethod.Post, new { onkeydown = "return event.keyCode!=13" }))
+{
+    <h3> Image gallery</h3>
+@* Code removed *@
+<b>
+    Room: &nbsp;<input name="RoomName" id="roomName" value=@ViewData["roomName"] readonly /><br />
+    Id:&nbsp;<input name="RoomId" id="roomId" value=@ViewData["roomId"] readonly />
+</b>
+<br />
+<br />
+
+<div class="demo-section">
+    @(Html.Kendo().Upload()
+                    .Name("images")
+                    .HtmlAttributes(new { aria_label = "images" })
+        )
+    <p style="padding-top: 1em; text-align: right">
+        <button type="submit" class="k-button k-button-solid-primary ">Submit</button>
+    </p>
+</div>
+}
+@*</form>*@
+
+@*<div class="row">
+    @if (Model.RoomImageList != null)
+    {
+        foreach (var image in Model.RoomImageList)
+        {
+            string path = "~/RoomGallery/" + ViewData["roomId"] + "/" + image.Id + image.Ext;
+            <div class="col-sm-2">
+                <a href="@Url.Content(path)" data-toggle="lightbox" data-gallery="gallery">
+                    <img src="@path" asp-append-version="true" class="img-fluid mb-2">
+                </a>
+                <a href="@Url.Action("DeletePhoto","RoomGallery",new { roomId= ViewData["roomId"],roomName=  ViewData["roomName"], imageId=image.Id})" style="float:right">Delete</a>
+            </div>
+        }
+    }
+</div>*@
+<style>
+    input {
+        background: transparent !important;
+        border: none !important;
+        outline: none !important;
+        padding: 0px 0px 0px 0px !important;
+    }
+</style>
+<script>
+    function change(e) {
+        var checkBox = document.getElementById("myCheck");
+        checkBox.checked = false;
+        var scheduler = $("#scheduler").data("kendoScheduler");
+        scheduler.dataSource.read();
+    }
+    function filterBlocks() {
+        return {
+            FacultyId: $("#FacultyId").val()
+        };
+    }
+
+    function filterFloors() {
+        return {
+            BlockId: $("#BlockId").val()
+        };
+    }
+    function filterRooms() {
+        return {
+            FloorId: $("#FloorId").val()
+        };
+    }
+
+    const modal = document.querySelector('#modal');
+    const btn = document.querySelector('.button');
+    btn.addEventListener('click', () => {
+        modal.show();
+    });
+</script>
+
+
+@*<h6>Faculty:</h6>
+    <div data-container-for="FacultyId">
+        @(Html.Kendo().DropDownList()
+        .Name("FacultyId")
+        .HtmlAttributes(new { style = "width:100%" })
+        .OptionLabel("Select faculty...")
+        .DataTextField("FacultyName")
+        .DataValueField("Id")
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetFaculties", "Reservation");
+            });
+        })
+    )
+    </div>
+    <h6 style="margin-top: 2em;">Block:</h6>
+    @(Html.Kendo().DropDownList()
+        .Name("BlockId")
+        .HtmlAttributes(new { style = "width:100%" })
+        .OptionLabel("Select block...")
+        .DataTextField("BlockName")
+        .DataValueField("Id")
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Action("GetBlocks", "Reservation")
+                    .Data("filterBlocks");
+            })
+            .ServerFiltering(true);
+        })
+        .Enable(false)
+        .AutoBind(false)
+        .CascadeFrom("FacultyId")
+    )
+    <h6 style="margin-top: 2em;">Floor:</h6>
+    @(Html.Kendo().DropDownList()
+            .Name("FloorId")
+            .HtmlAttributes(new { style = "width:100%" })
+            .OptionLabel("Select floor...")
+            .DataTextField("FloorName")
+            .DataValueField("Id")
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("GetFloors", "Reservation")
+                        .Data("filterFloors");
+                })
+                .ServerFiltering(true);
+            })
+            .Enable(false)
+            .AutoBind(false)
+            .CascadeFrom("BlockId")
+    )
+    <h6 style="margin-top: 2em;">Room:</h6>
+    @(Html.Kendo().DropDownList()
+            .Name("RoomImage.RoomId")
+            .HtmlAttributes(new { style = "width:100%" })
+            .OptionLabel("Select room...")
+            .DataTextField("RoomName")
+            .DataValueField("Id")
+           // .Events(e => e.Change("change"))
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("GetRooms", "Reservation")
+                        .Data("filterRooms");
+                })
+                .ServerFiltering(true);
+            })
+            .Enable(false)
+            .AutoBind(false)
+            .CascadeFrom("FloorId")
+    )
+    <br />*@   

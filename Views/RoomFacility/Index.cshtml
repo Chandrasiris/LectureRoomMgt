@@ -1,0 +1,129 @@
+﻿@model LectureRoomMgt.Models.Reservation.RoomFacility
+@using Kendo.Mvc.UI
+<link href="~/Theme2/pace.min.css" rel="stylesheet" />
+<link href="~/Theme2/bootstrap-extended.css" rel="stylesheet" />
+<link href="~/Theme2/bootstrap.min.css" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<link href="~/Theme2/app.css" rel="stylesheet" />
+<link href="~/Theme2/icons.css" rel="stylesheet" />
+
+
+<link href="~/custom/css/kendo.bootstrap-main.css" rel="stylesheet" />
+<script src="~/custom/js/jszip.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_jquery.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.all.min.js"></script>
+<script src="~/custom/js/2023/kendo.cdn.telerik.com_2023.2.606_js_kendo.aspnetmvc.min.js"></script>
+
+
+<style>
+    .k-grid tbody tr {
+        line-height: 14px;
+    }
+
+    .k-grid tbody td {
+        padding: 5px;
+    }
+
+    .k-grid-save-changes:hover {
+        background-color: #5cb85c;
+    }
+
+    .k-grid-delete-custom {
+        background-color: tomato;
+    }
+
+    .k-grid-cancel-changes:hover {
+        background-color: red;
+    }
+
+    .k-grid-excel:hover {
+        background-color: forestgreen;
+    }
+
+    .k-grid-pdf:hover {
+        background-color: red;
+    }
+
+    .k-grid .k-grid-toolbar .k-grid-add,
+    .k-grid .k-grid-toolbar .k-grid-save-changes,
+    .k-grid .k-grid-toolbar .k-grid-cancel-changes,
+    .k-grid .k-grid-toolbar .k-grid-delete-custom {
+        min-width: 0;
+    }
+
+        .k-grid .k-grid-toolbar .k-grid-add .k-icon,
+        .k-grid .k-grid-toolbar .k-grid-save-changes .k-icon,
+        .k-grid .k-grid-toolbar .k-grid-cancel-changes .k-icon,
+        .k-grid .k-grid-toolbar .k-grid-delete-custom .k-icon {
+            margin: 0;
+        }
+</style>
+
+
+<div class="card border-top border-0 border-4 border-info">
+    <div class="card-body">
+        <div class="border p-4 rounded">
+            <div class="card-title d-flex align-items-center">
+                <div>
+                    <i class="bx bxs-home me-1 font-22 text-info"></i>
+                </div>
+                <h5 class="mb-0 text-info">Create Facility</h5>
+            </div><br />
+            <hr />
+
+            @(Html.Kendo().Grid<LectureRoomMgt.Models.Reservation.Facility>()
+                    .Name("grid")
+                    .Columns(columns =>
+                    {
+                        columns.Select().Width(75).HtmlAttributes(new { @class = "checkbox-align" }).HeaderHtmlAttributes(new { @class = "checkbox-align" });
+                        columns.Bound(p => p.Category).Width(180);
+                        columns.Bound(p => p.SubCategory).Width(180);
+                        columns.Bound(p => p.FacilityDescription);
+                        columns.Bound(p => p.Comment);
+                    })
+                    .ToolBar(toolBar =>
+                    {
+                        toolBar.Save();
+                    })
+                    .Pageable()
+                    .Sortable()
+                    .Scrollable(sc => sc.Endless(true))
+                    .HtmlAttributes(new { style = "height:550px;" })
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .Batch(true)
+                        .PageSize(20)
+                        .ServerOperation(false)
+                        .Events(events => events.Error("errorHandler"))
+                        .Model(model =>
+                        {
+                            model.Id(p => p.Id);
+                            model.Field(p => p.Id).Editable(false);
+                            model.Field(p => p.Category).Editable(false);
+                            model.Field(p => p.SubCategory).Editable(false);
+                            model.Field(p => p.Comment).Editable(false);
+                            model.Field(p => p.FacilityDescription).Editable(false);
+                            })
+                        .Read(read => read.Action("Read", "RoomFacility"))
+                       // .Update(update => update.Action("Update", "RoomFacility"))
+                        
+                    )
+            )
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+                function errorHandler(e) {
+                    if (e.errors) {
+                        var message = "Errors:\n";
+                        $.each(e.errors, function (key, value) {
+                            if ('errors' in value) {
+                                $.each(value.errors, function () {
+                                    message += this + "\n";
+                                });
+                            }
+                        });
+                        alert(message);
+                    }
+                }
+</script>

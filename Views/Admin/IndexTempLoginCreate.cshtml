@@ -1,0 +1,431 @@
+﻿@model LectureRoomMgt.Models.TempLogin;
+@inject IAuthorizationService authorization
+@{
+    ViewBag.Title = "Create Login";
+    ViewBag.View = "Create Login";
+
+    var ModClaimCheck = "false";
+    var DelClaimCheck = (await authorization.AuthorizeAsync(User, "RemoveLoginProfiles")).Succeeded ? "true" : "false";
+}
+
+<div id="loader" class="modal" style="width:100%;height:100%;position:fixed;margin:0;padding:0;text-align:center">
+    <div style="position:absolute;top:50%;left:50%">
+        <img src="~/Resources/loader.gif" width="100" height="100" />
+    </div>
+</div>
+
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Login</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="myModalBody">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success btn-sm" id="btnEdit">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Are you sure?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="myModalBody">
+                <p>Do you really want to delete this record?<br /> <b>This process cannot be undone</b>.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger btn-sm" id="btnDelete">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="errorModalLabel">404 Error Page</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="myModalBody">
+                <div class="error-page">
+                    <h2 class="headline text-warning">404</h2>
+
+                    <div class="error-content">
+                        <h3><i class="fas fa-exclamation-triangle text-warning"></i> Oops! Page not found..</h3>
+                        <p>
+                            Meanwhile, you may <a href='@Url.Action("Index", "Home")'>return to HOME</a> or contact the system administrator.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@Html.AntiForgeryToken()
+
+<div class="row">
+    <div class="col-8 offset-2">
+        <form id="saveForm">
+
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-footer">
+                        <div class="form-group" style="text-align:center">
+                            <div class="form-check form-check-inline mr-5">
+                                <input class="form-check-input" type="radio" asp-for="UserType" name="inlineRadioOptions" id="inlineRadio1" checked="checked" value="I">
+                                <label class="form-check-label" for="inlineRadio1" style="font-size:large;font-weight:600">Staff</label>
+                            </div>
+                            <div class="form-check form-check-inline mr-5">
+                                <input class="form-check-input" type="radio" asp-for="UserType" name="inlineRadioOptions" id="inlineRadio2" value="L">
+                                <label class="form-check-label" for="inlineRadio2" style="font-size:large;font-weight:600">Lecturer</label>
+                            </div>
+                            <div class="form-check form-check-inline mr-5">
+                                <input class="form-check-input" type="radio" asp-for="UserType" name="inlineRadioOptions" id="inlineRadio2" value="A">
+                                <label class="form-check-label" for="inlineRadio2" style="font-size:large;font-weight:600">Staff-Assistant</label>
+                            </div>
+
+                            <div class="form-check form-check-inline mr-5">
+                                <input class="form-check-input" type="radio" asp-for="UserType" name="inlineRadioOptions" id="inlineRadio2" value="S">
+                                <label class="form-check-label" for="inlineRadio2" style="font-size:large;font-weight:600">Student</label>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-6 offset-3">
+                <div class="form-row">
+                    <div class="form-group col-9 mb-3 general" hidden>
+                        <label asp-for="Name" class="control-label"></label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-9 mb-3 general" hidden>
+                        <label asp-for="Tel" class="control-label"></label>
+                        <input asp-for="Tel" class="form-control" />
+                        <span asp-validation-for="Tel" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-9 mb-3" id="emailSection">
+                        <label asp-for="Email" class="control-label"></label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group col-3 mb-3 mt-4">
+                        <div class="mt-2">
+                            <button id="btnSave" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="bottom" title="Save !"><i class="fa fa-save"></i> Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="row" style="text-align:left">
+    <a asp-controller="Admin" asp-action="IndexTempLogin" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="bottom" title="Back to users !"><i class="fas fa-arrow-alt-circle-left"></i> Back</a>
+</div>
+
+<hr />
+
+<table id="infoTable" class="table table-hover table-striped">
+    <thead>
+
+        <tr class="info" style="background-color:gainsboro">
+            <th colspan="4" style="text-align:center;border-right-style:groove">
+                @Html.DisplayName("Information")
+            </th>
+            <th colspan="2" style="text-align:center">
+                @Html.DisplayName("Action")
+            </th>
+
+        </tr>
+
+
+        <tr class="info">
+
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Tel)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserType)
+            </th>
+            <th>
+            </th>
+            <th>
+            </th>
+
+        </tr>
+
+    </thead>
+</table>
+<input type="hidden" id="hiddenId" />
+
+<script>
+    $(document).ready(function () {
+
+        var table = $('#infoTable').DataTable({
+            "ajax": '@Url.Action("LoginLoad", "Admin")',
+            "columnDefs": [
+                        { "targets": [4], "visible": @ModClaimCheck, "width": "10px" },
+                        { "targets": [5], "visible": @DelClaimCheck, "width": "10px" }
+                    ],
+            "columns": [
+                    { "data": "Name", "autowidth": true },
+                    { "data": "Tel", "autowidth": true },
+                    { "data": "Email", "autowidth": true },
+                    { "data": "UserType", "render": function (data, type, row){
+                          if (data == "I") {
+                              return '<label class="badge badge-primary" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">Staff</label>';
+                          }
+                          else if (data == "L") {
+                              return '<label class="badge badge-warning" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">Lecturer</label>';
+                          }
+                          else if (data == "A") {
+                              return '<label class="badge badge-dark" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">Staff-Assistant</label>';
+                          }
+                          else if (data == "S") {
+                              return '<label class="badge badge-success" style="font-family:Arial, Helvetica, sans-serif;font-size:12px">Student</label>';
+                          }
+
+                       }
+                    },
+                    { "data": "EncryptAccessCode", "render": function (data, type, row) {
+                          return '<a id="' + data + '" class="btn btn-warning btn-xs tblBtnEdit" href="#" data-toggle="tooltip" data-placement="bottom" title="Edit!"> <span class="fas fa-edit"></span> </a>';
+                                 },"orderable": false
+                    },
+                    { "data": "EncryptAccessCode", "render": function (data, type, row) {
+                          return '<a id="' + data + '" class="btn btn-danger btn-xs tblBtnDelete" href="#" data-toggle="tooltip" data-placement="bottom" title="Delete!"> <span class="fas fa-trash-alt"></span> </a>';
+                                 },"orderable": false
+                    }
+                    ],
+            "scrollY": "300px",
+            "scrollCollapse": true,
+            "autoWidth": true,
+            "processing": true,
+            "rowId": 'EncryptAccessCode'
+        });
+
+        $('#infoTable').on('click', '.tblBtnEdit', function () {
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("EditTempLogin", "Admin")',
+                contentType: "application/json; charset=utf-8",
+                data: { code: $(this).attr('id') },
+                datatype: "json",
+            }).done(function (response) {
+                    if (response.status != "4") {
+                        $('#myModalBody').html(response);
+                        $('#editModal').modal('show');
+                    }
+                    else {
+                       $('#errorModal').modal('show');
+                    }
+            });
+        });
+
+        $('#infoTable').on('click', '.tblBtnDelete', function () {
+            $("#hiddenId").val($(this).attr('id'));
+            $('#deleteModal').modal('show');
+        });
+
+
+        $("#btnSave").click(function (e) {
+            e.preventDefault();
+
+            if (!$('#saveForm').valid()) {
+                return false;
+            }
+
+            if ( $('#Email').val() == '') {
+                    toastr.warning('Please fill out all the fields !');
+                    return;
+                }
+
+           // if ($("input[type='radio']:checked").val() == 'I') {
+           //     if ($('#Name').val() == '' || $('#Tel').val() == '' || $('#Email').val() == '') {
+           //         toastr.warning('Please fill out all the fields !');
+           //         return;
+           //     }
+           // }
+           //else {
+           //     if ($('#Name').val() == '' || $('#Tel').val() == '') {
+           //         toastr.warning('Please fill out all the fields !');
+           //         return;
+           //     }
+           //}
+
+            var tempObj = {
+                Name: $('#Name').val(),
+                Tel: $('#Tel').val(),
+                Email: $('#Email').val(),
+                UserType: $("input[type='radio']:checked").val()
+            };
+
+            $('#loader').show();
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: '@Url.Action("CreateTempLogin", "Admin")',
+                dataType: "json",
+                data: JSON.stringify(tempObj),
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                $('#loader').hide();
+
+                if (response.status == "1") {
+                    $('#Name').val('');
+                    $('#Tel').val('');
+                    $('#Email').val('');
+
+                    table.row.add({
+                        "Name": response.tempObj['Name'],
+                        "Tel": response.tempObj['Tel'],
+                        "Email": response.tempObj['Email'],
+                        "UserType": response.tempObj['UserType'],
+                        "EncryptAccessCode": response.tempObj['EncryptAccessCode'],
+                        "EncryptAccessCode": response.tempObj['EncryptAccessCode']
+                    }).draw(false);
+                    $("#countSpan").text(parseInt($("#countSpan").text()) + 1);
+
+                    toastr.success('Created successfully !');
+                }
+                else if (response.status == "2") {
+                    toastr.warning('An account is already created for this user !');
+                }
+
+                else {
+                    toastr.error(response.status);
+                    console.log(response.status);
+                }
+            }).fail(function (response) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+
+
+        $("#btnEdit").click(function () {
+
+            $.validator.unobtrusive.parse($('#editForm'));
+
+            if (!$('#editForm').valid()) {
+                return false;
+            }
+
+            if ($("input:radio.modalEdit:checked").val() == 'I') {
+                if ($('#MName').val() == '' || $('#MTel').val() == '' || $('#MEmail').val() == '') {
+                    toastr.warning('Please fill out all the fields !');
+                    return;
+                }
+            }
+            else {
+                if ($('#MName').val() == '' || $('#MTel').val() == '') {
+                    toastr.warning('Please fill out all the fields !');
+                    return;
+                }
+            }
+
+            var tempLogin = {
+                EncryptAccessCode: $('#EncryptAccessCode').val(),
+                Name: $('#MName').val(),
+                Tel: $('#MTel').val(),
+                Email: $('#MEmail').val(),
+                UserType: $("input:radio.modalEdit:checked").val()
+            };
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: '@Url.Action("EditTempLogin", "Admin")',
+                dataType: "json",
+                data: JSON.stringify(tempLogin),
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+
+                $('#editModal').modal('hide');
+                if (response.status == "1") {
+
+                    table.row('#' + $('#EncryptAccessCode').val()).remove().draw(false);
+                    table.row.add({
+                        "Name": response.tempLogin['Name'],
+                        "Tel": response.tempLogin['Tel'],
+                        "Email": response.tempLogin['Email'],
+                        "UserType": response.tempLogin['UserType'],
+                        "EncryptAccessCode": response.tempLogin['EncryptAccessCode'],
+                        "EncryptAccessCode": response.tempLogin['EncryptAccessCode']
+                    }).draw(false);
+
+                    toastr.success('Saved successfully !');
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (response) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+
+
+        $("#btnDelete").click(function (e) {
+            e.preventDefault();
+
+            var TempId = $("#hiddenId").val();
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: '@Url.Action("DeleteTempLogin", "Admin")',
+                dataType: "json",
+                data: JSON.stringify(TempId),
+                headers: { RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val() }
+            }).done(function (response) {
+                if (response.status == "1") {
+                    $('#deleteModal').modal('hide');
+                    table.row('#' + TempId).remove().draw(false);
+                    $("#countSpan").text(parseInt($("#countSpan").text()) - 1);
+                    toastr.success('Deleted successfully !');
+                }
+                else {
+                    toastr.error('An error has occured !');
+                }
+            }).fail(function (jqXHR, textStatus) {
+                toastr.error('An unknown error has occured, Please contact administrator !');
+            });
+        });
+    });
+
+</script>
