@@ -17,7 +17,7 @@ jobs:
                 run: |
                   dotnet restore LectureRoomMgt.csproj \
                     --source https://api.nuget.org/v3/index.json \
-                    --source ./nuget-packages
+                    --source ./nugetpackages
 
             -   name: build
                 run: dotnet build LectureRoomMgt.csproj --configuration release --no-restore
