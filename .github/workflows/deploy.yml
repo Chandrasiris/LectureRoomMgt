@@ -17,7 +17,7 @@ jobs:
                 run: dotnet restore LetureRoomMgt.csproj
 
             -   name: build
-                run: dotnet build /blob/main/LectureRoomMgt.csproj --configuration release --no-restore
+                run: dotnet build LectureRoomMgt.csproj --configuration release --no-restore
 
 
 
