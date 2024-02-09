@@ -1,0 +1,24 @@
+#github actions to deploy Lecture rooms management system.
+
+name: Deploy LRMS
+on: 
+    workflow_dispatch:
+jobs:
+    buid:
+        runs-on: ubuntu-latest
+        steps:
+            -   uses: actions/checkout@v3
+
+            -   name: Setup .Net Core
+                uses: actions/Setup-dotnet@v3
+                with: 
+                    dotnet-version: 3.1 
+
+            -   name: Install dependencies
+                run: dotnet restore LetureRoomMgt.csproj
+
+            -   name: build
+                run: dotnet build LectureRoomMgt.csproj --configuration release --no-restore
+
+
+
