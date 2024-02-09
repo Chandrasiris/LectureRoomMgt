@@ -14,7 +14,7 @@ jobs:
                 with: 
                     dotnet-version: 7.0.x
             -   name: Install dependencies
-                run: dotnet restore LetureRoomMgt.csproj
+                run: dotnet restore LectureRoomMgt.csproj
 
             -   name: build
                 run: dotnet build LectureRoomMgt.csproj --configuration release --no-restore
