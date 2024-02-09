@@ -7,12 +7,16 @@ jobs:
     buid:
         runs-on: ubuntu-latest
         steps:
-            -   uses: actions/checkout@v3
+            -   uses: actions/checkout@v2
 
             -   name: Setup .Net Core
-                uses: actions/Setup-dotnet@v3
+                uses: actions/Setup-dotnet@v2
                 with: 
+<<<<<<< HEAD
                     dotnet-version: 7.0.x
+=======
+                    
+>>>>>>> 9c12e72e2947c29493470e3963ceca3376ecf122
 
             -   name: Install dependencies
                 run: dotnet restore LetureRoomMgt.csproj
