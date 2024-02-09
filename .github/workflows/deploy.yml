@@ -12,7 +12,7 @@ jobs:
             -   name: Setup .Net Core
                 uses: actions/Setup-dotnet@v3
                 with: 
-                    dotnet-version: 3.1 
+                    dotnet-version: 7.0.x
 
             -   name: Install dependencies
                 run: dotnet restore LetureRoomMgt.csproj
