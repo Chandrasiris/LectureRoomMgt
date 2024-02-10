@@ -19,7 +19,7 @@ jobs:
     - name: Setup .NET Core SDK
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '3.1.x' # Adjust version as per your project's requirements
+        dotnet-version: '3.1.x'
         
     - name: Restore dependencies
       run: dotnet restore --source ./nugetpackages --source https://api.nuget.org/v3/index.json

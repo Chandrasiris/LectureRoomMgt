@@ -17,11 +17,11 @@ namespace LectureRoomMgt.Controllers.Courses
 {
     public class CourseController : Controller
     {
-        // public UserManager<ApplicationUser> UserManager { get; }
-        // public SignInManager<ApplicationUser> SignInManager { get; }
-        // public WisdomAppDBContext Context { get; }
-        // private static bool UpdateDatabase = false;
-        // private ISession session;
+        public UserManager<ApplicationUser> UserManager { get; }
+        public SignInManager<ApplicationUser> SignInManager { get; }
+        public WisdomAppDBContext Context { get; }
+        private static bool UpdateDatabase = false;
+        private ISession session;
         public ISession Session { get { return session; } }
         public CourseController(UserManager<ApplicationUser> userManager,
                                  SignInManager<ApplicationUser> signInManager,
