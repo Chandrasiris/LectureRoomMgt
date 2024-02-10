@@ -3,6 +3,8 @@
 name: Deploy LRMS
 on: 
     workflow_dispatch:
+env:
+    AZURE_WEBAPP_NAME : "LRMS"
 jobs:
     build:
         runs-on: ubuntu-latest
@@ -17,6 +19,15 @@ jobs:
                 run: dotnet restore --source ./nugetpackages --source https://api.nuget.org/v3/index.json
                 working-directory: ${{ github.workspace }}
                   
-
             -   name: build
                 run: dotnet build LectureRoomMgt.csproj --configuration release --no-restore
+
+            -   name: publish
+                run: dotnet publish LectureRoomMgt.csproj --configuration release --output ./publish               
+            
+            -   name: deploy to Azure Web App
+                uses: azure/webapps-deploy@v2
+                with: 
+                    app-name: ${{ env.AZURE_WEBAPP_NAME }}
+                    publish-profile: ${{ secrets.GITHUB_TOKEN.LRMS_PUBLISH_SECRET }}
+                    package: ./publish
