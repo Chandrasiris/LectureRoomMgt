@@ -15,9 +15,9 @@ jobs:
                     dotnet-version: 7.0.x
             -   name: Install dependencies
                 run: |
-                  dotnet restore LectureRoomMgt.csproj \
-                    --source https://api.nuget.org/v3/index.json \
-                    --source ./nugetpackages
+                  dotnet restore LectureRoomMgt.csproj \                    
+                    --source ./nugetpackages\
+                    --source https://api.nuget.org/v3/index.json
 
             -   name: build
                 run: dotnet build LectureRoomMgt.csproj --configuration release --no-restore
