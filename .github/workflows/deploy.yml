@@ -16,7 +16,7 @@ jobs:
             -   name: Install dependencies
                 run: |
                   dotnet restore LectureRoomMgt.csproj \                    
-                    --source ./nugetpackages\
+                    --source ./nugetpackages \
                     --source https://api.nuget.org/v3/index.json
 
             -   name: build
