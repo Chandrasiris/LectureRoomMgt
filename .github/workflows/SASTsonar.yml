@@ -22,3 +22,8 @@ jobs:
             -Dsonar.organization=chandrasiris
             -Dsonar.projectKey=LecRoomMgtSys
             -Dsonar.cs.vscoveragexml.reportsPaths=**/*.coveragexml
+      - name: Upload SonarCloud Analysis Report
+        uses: actions/upload-artifact@v2
+        with:
+          name: sonarcloud-report
+          path: LectureRoomMgt/SecurityAnalysis/Sonar
