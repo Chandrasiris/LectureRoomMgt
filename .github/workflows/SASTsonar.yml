@@ -22,8 +22,13 @@ jobs:
             -Dsonar.organization=chandrasiris
             -Dsonar.projectKey=LecRoomMgtSys
             -Dsonar.cs.vscoveragexml.reportsPaths=**/*.coveragexml
-      - name: Upload SonarCloud Analysis Report
+      - name: Generate Annotations File
+        run: |
+          echo "Your annotation content here" > sonar-annotations.txt
+      - name: Upload SonarCloud Analysis Report and Annotations
         uses: actions/upload-artifact@v2
         with:
           name: sonarcloud-report
-          path: LectureRoomMgt/SecurityAnalysis/Sonar
+          path: |
+            LectureRoomMgt/SecurityAnalysis/Sonar
+            sonar-annotations.txt
