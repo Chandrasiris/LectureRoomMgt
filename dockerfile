@@ -9,8 +9,8 @@ WORKDIR /src
 
 # Copy the csproj file and restore Telerik UI from local source
 COPY ["LectureRoomMgt.csproj", "LectureRoomMgt/"]
-#RUN dotnet restore "LectureRoomMgt.csproj" --source ./nugetpackages
-RUN dotnet restore --source ./nugetpackages --source https://api.nuget.org/v3/index.json
+RUN dotnet restore "LectureRoomMgt.csproj" --source ./nugetpackages
+#RUN dotnet restore --source ./nugetpackages --source https://api.nuget.org/v3/index.json
 #working-directory: ${{ github.workspace }}
 # Copy the source code
 COPY . .
@@ -18,9 +18,8 @@ COPY . .
 # Install remaining dependencies from public NuGet repository
 RUN dotnet restore --source https://api.nuget.org/v3/index.json
 
-# Build your ASP.NET Core application
+# Build application
 RUN dotnet build "LectureRoomMgt/LectureRoomMgt.csproj" -c Release -o /app/build
-
 # Use the build output from the previous stage
 FROM build AS publish
 RUN dotnet publish "LectureRoomMgt/LectureRoomMgt.csproj" -c Release -o /app/publish
