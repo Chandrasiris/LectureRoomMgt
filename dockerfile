@@ -9,8 +9,9 @@ WORKDIR /src
 
 # Copy the csproj file and restore Telerik UI from local source
 COPY ["LectureRoomMgt.csproj", "LectureRoomMgt/"]
-RUN dotnet restore "LectureRoomMgt.csproj" --source ./nugetpackages
-
+#RUN dotnet restore "LectureRoomMgt.csproj" --source ./nugetpackages
+RUN dotnet restore --source ./nugetpackages --source https://api.nuget.org/v3/index.json
+#working-directory: ${{ github.workspace }}
 # Copy the source code
 COPY . .
 
