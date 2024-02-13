@@ -5,16 +5,14 @@ on:
     branches:
       - main
 
-stages:
-  - build
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-build:
-  stage: build
-  image: docker:stable
-  services:
-    - docker:dind
-  script:
-    - docker build -t lrmsDI .
-    - docker push lrmsDI
-  only:
-    - main
+      - name: Build and push Docker image
+        run: |
+          docker build -t lrmsDI .
+          docker push lrmsDI
