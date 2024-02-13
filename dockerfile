@@ -7,7 +7,7 @@ EXPOSE 80
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 COPY ["LectureRoomMgt.csproj", "LectureRoomMgt/"]
-RUN dotnet restore "LectureRoomMgt/LectureRoomMgt.csproj"
+RUN dotnet restore "LectureRoomMgt.csproj"
 
 # Copy the source code
 COPY . .
