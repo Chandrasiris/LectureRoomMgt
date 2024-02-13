@@ -1,13 +1,20 @@
-stages:
-    - build
-build:
-    stage: build
-    image: docker:stable
-    services:
-      - docker:dind
-    script:
-      - docker build -t lrmsDI .
-      - docker push lrmsDI
-    only:
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
       - main
-  
+
+stages:
+  - build
+
+build:
+  stage: build
+  image: docker:stable
+  services:
+    - docker:dind
+  script:
+    - docker build -t lrmsDI .
+    - docker push lrmsDI
+  only:
+    - main
