@@ -6,14 +6,16 @@ EXPOSE 80
 # Use the ASP.NET Core SDK image as build stage
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
+
+# Copy the csproj file and restore Telerik UI from local source
 COPY ["LectureRoomMgt.csproj", "LectureRoomMgt/"]
-RUN dotnet restore "LectureRoomMgt.csproj"
+RUN dotnet restore "LectureRoomMgt.csproj" --source ./nugetpackages
 
 # Copy the source code
 COPY . .
 
-# Install Telerik UI using a local file source
-RUN dotnet add package Telerik.UI.for.AspNet.Core --source ./nugetpackages
+# Install remaining dependencies from public NuGet repository
+RUN dotnet restore --source https://api.nuget.org/v3/index.json
 
 # Build your ASP.NET Core application
 RUN dotnet build "LectureRoomMgt/LectureRoomMgt.csproj" -c Release -o /app/build
